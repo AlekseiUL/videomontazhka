@@ -38,8 +38,8 @@ description: Turn a long stream, several takes, or mixed footage into a shorter 
 
 1. Прочитай [editorial-workflow.md](references/editorial-workflow.md) и [project-format.md](references/project-format.md).
 2. Для графики прочитай [visual-language.md](references/visual-language.md). Для retention/creative-задачи также прочитай [creative-direction.md](references/creative-direction.md) и [free-toolchain.md](references/free-toolchain.md).
-3. Запусти `python "$SKILL_DIR/scripts/doctor.py"`. Required failure блокирует соответствующую стадию; optional failure только отключает capability.
-4. Запусти `python "$SKILL_DIR/scripts/init_project.py" <videos_dir>`. Добавь `--recursive`, если исходники лежат во вложенных папках.
+3. Запусти `python3 "$SKILL_DIR/scripts/doctor.py"`. Required failure блокирует соответствующую стадию; optional failure только отключает capability.
+4. Запусти `python3 "$SKILL_DIR/scripts/init_project.py" <videos_dir>`. Добавь `--recursive`, если исходники лежат во вложенных папках.
 5. Из manifest определи режим:
    - `long_stream` — длинная запись или поток записей с исходной хронологией;
    - `multi_take` — дубли, которые можно переставлять по смыслу;
@@ -76,13 +76,13 @@ preflight и запроси новое явное согласие. Перед F
 private snapshot, чьи фактические size/SHA-256 совпали с approved source.
 
 ```bash
-python "$SKILL_DIR/scripts/transcription_preflight.py" <videos_dir> --language <code>
-python "$SKILL_DIR/scripts/record_transcription_approval.py" \
+python3 "$SKILL_DIR/scripts/transcription_preflight.py" <videos_dir> --language <code>
+python3 "$SKILL_DIR/scripts/record_transcription_approval.py" \
   --edit-dir <videos_dir>/edit \
   --max-billable-minutes <утверждённый-лимит> \
   --quote '<дословное подтверждение пользователя>' \
   --acknowledge-upload
-python "$SKILL_DIR/scripts/transcribe_batch_safe.py" <videos_dir> --language <code>
+python3 "$SKILL_DIR/scripts/transcribe_batch_safe.py" <videos_dir> --language <code>
 ```
 
 Требования к транскриптам:
@@ -97,7 +97,7 @@ python "$SKILL_DIR/scripts/transcribe_batch_safe.py" <videos_dir> --language <co
 После транскрибации создай evidence view:
 
 ```bash
-python "$SKILL_DIR/scripts/pack_transcripts_safe.py" --edit-dir <videos_dir>/edit
+python3 "$SKILL_DIR/scripts/pack_transcripts_safe.py" --edit-dir <videos_dir>/edit
 ```
 
 ## Gate 2 — смысл, формат и длительность
@@ -120,10 +120,10 @@ python "$SKILL_DIR/scripts/pack_transcripts_safe.py" --edit-dir <videos_dir>/edi
 После точного согласия:
 
 ```bash
-python "$SKILL_DIR/scripts/record_approval.py" \
+python3 "$SKILL_DIR/scripts/record_approval.py" \
   --plan <videos_dir>/edit/semantic_plan.json \
   --quote '<дословное подтверждение пользователя>'
-python "$SKILL_DIR/scripts/validate_gate.py" --edit-dir <videos_dir>/edit --phase asset
+python3 "$SKILL_DIR/scripts/validate_gate.py" --edit-dir <videos_dir>/edit --phase asset
 ```
 
 Изменение смыслов, порядка, обещания, формата или target duration меняет hash и требует нового approval.

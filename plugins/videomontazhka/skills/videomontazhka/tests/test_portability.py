@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -14,6 +15,15 @@ SCRIPTS = ROOT / "scripts"
 
 
 class PortabilityTest(unittest.TestCase):
+    def test_skill_commands_use_python3_on_macos(self) -> None:
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        bare_python = [
+            f"{line_number}: {line}"
+            for line_number, line in enumerate(skill.splitlines(), start=1)
+            if re.search(r"(^|[` ])python(?:\s|`)", line)
+        ]
+        self.assertEqual(bare_python, [])
+
     def test_checked_in_scripts_have_no_author_or_neighbour_skill_paths(self) -> None:
         banned = (
             "/Users/aleksejulanov",
