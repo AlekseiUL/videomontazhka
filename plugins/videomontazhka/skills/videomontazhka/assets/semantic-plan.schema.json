@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprut.local/schemas/semantic-plan.schema.json",
+  "title": "SPRUT semantic edit plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "status",
+    "viewer_promise",
+    "audience",
+    "source_mode",
+    "source_truth",
+    "narrative",
+    "hooks",
+    "recommended_hook_id",
+    "ending",
+    "visual_plan",
+    "audio_plan",
+    "deliverables"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "id": {"$ref": "#/$defs/id"},
+    "status": {"enum": ["pending", "approved"]},
+    "viewer_promise": {"type": "string", "minLength": 10, "maxLength": 1000},
+    "audience": {"type": "string", "minLength": 3, "maxLength": 500},
+    "source_mode": {"enum": ["long_stream", "multi_take", "mixed"]},
+    "source_truth": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/sourceMeaning"}
+    },
+    "narrative": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/narrativeSection"}
+    },
+    "keep": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/editorialDecision"}
+    },
+    "cut": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/editorialDecision"}
+    },
+    "clarify": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/editorialDecision"}
+    },
+    "hooks": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"$ref": "#/$defs/hook"}
+    },
+    "recommended_hook_id": {"$ref": "#/$defs/id"},
+    "ending": {"$ref": "#/$defs/ending"},
+    "visual_plan": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/visualTreatment"}
+    },
+    "audio_plan": {"$ref": "#/$defs/audioPlan"},
+    "research_basis": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/researchItem"}
+    },
+    "deliverables": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/deliverable"}
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^\\S(?:.*\\S)?$"
+    },
+    "meaningIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/id"}
+    },
+    "fps": {
+      "oneOf": [
+        {"type": "number", "minimum": 20, "maximum": 60},
+        {"type": "string", "pattern": "^[1-9][0-9]*/[1-9][0-9]*$"}
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source", "start", "end", "modality"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "source": {"$ref": "#/$defs/id"},
+        "start": {"type": "number", "minimum": 0},
+        "end": {"type": "number", "exclusiveMinimum": 0},
+        "modality": {"enum": ["speech", "visual"]},
+        "quote": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "description": {"type": "string", "minLength": 1, "maxLength": 4000}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"modality": {"const": "speech"}},
+            "required": ["modality"]
+          },
+          "then": {
+            "required": ["quote"],
+            "properties": {"description": false}
+          }
+        },
+        {
+          "if": {
+            "properties": {"modality": {"const": "visual"}},
+            "required": ["modality"]
+          },
+          "then": {
+            "required": ["description"],
+            "properties": {"quote": false}
+          }
+        }
+      ]
+    },
+    "sourceMeaning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "meaning", "evidence"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "meaning": {"type": "string", "minLength": 3, "maxLength": 2000},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/evidence"}
+        }
+      }
+    },
+    "narrativeSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "purpose", "meaning_ids", "payoff", "estimated_duration_s"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "title": {"type": "string", "minLength": 2, "maxLength": 300},
+        "purpose": {"type": "string", "minLength": 3, "maxLength": 1500},
+        "meaning_ids": {"$ref": "#/$defs/meaningIds"},
+        "payoff": {"type": "string", "minLength": 2, "maxLength": 1500},
+        "estimated_duration_s": {"type": "number", "exclusiveMinimum": 0},
+        "bridge_from_previous": {"type": ["string", "null"], "maxLength": 500}
+      }
+    },
+    "editorialDecision": {
+      "oneOf": [
+        {"type": "string", "minLength": 2, "maxLength": 1000},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text", "reason"],
+          "properties": {
+            "text": {"type": "string", "minLength": 2, "maxLength": 1000},
+            "reason": {"type": "string", "minLength": 2, "maxLength": 1000},
+            "meaning_ids": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"$ref": "#/$defs/id"}
+            }
+          }
+        }
+      ]
+    },
+    "hook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "payoff", "meaning_ids"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "text": {"type": "string", "minLength": 3, "maxLength": 500},
+        "payoff": {"type": "string", "minLength": 2, "maxLength": 1000},
+        "meaning_ids": {"$ref": "#/$defs/meaningIds"},
+        "opening_visual": {"type": ["string", "null"], "maxLength": 1000},
+        "why_it_works": {"type": ["string", "null"], "maxLength": 1000},
+        "estimated_duration_s": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "ending": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["section_id", "meaning_ids", "takeaway"],
+      "properties": {
+        "section_id": {"$ref": "#/$defs/id"},
+        "takeaway": {"type": "string", "minLength": 3, "maxLength": 1500},
+        "closing_line": {"type": ["string", "null"], "maxLength": 1000},
+        "cta": {"type": ["string", "null"], "maxLength": 1000},
+        "meaning_ids": {"$ref": "#/$defs/meaningIds"},
+        "end_card": {"type": ["string", "null"], "maxLength": 1000}
+      }
+    },
+    "visualTreatment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "section_id", "meaning_ids", "treatment", "purpose", "approved_text", "asset_type"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "section_id": {"$ref": "#/$defs/id"},
+        "meaning_ids": {"$ref": "#/$defs/meaningIds"},
+        "treatment": {"type": "string", "minLength": 2, "maxLength": 1500},
+        "purpose": {"type": "string", "minLength": 2, "maxLength": 1000},
+        "approved_text": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 1, "maxLength": 4000}
+          ]
+        },
+        "asset_type": {
+          "enum": ["none", "title", "chapter", "diagram", "comparison", "process", "quote", "cta", "b_roll"]
+        }
+      }
+    },
+    "audioPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cleanup": {"type": "string", "minLength": 2, "maxLength": 1000},
+        "target_lufs": {"type": "number", "minimum": -30, "maximum": -5},
+        "true_peak_dbtp": {"type": "number", "minimum": -12, "maximum": 0},
+        "dialogue_priority": {"type": ["string", "null"], "maxLength": 1000},
+        "music_policy": {"type": ["string", "null"], "maxLength": 1000},
+        "sfx_policy": {"type": ["string", "null"], "maxLength": 1000}
+      }
+    },
+    "researchItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "insight", "applied_to"],
+      "properties": {
+        "source": {"type": "string", "minLength": 2, "maxLength": 1000},
+        "url": {"type": ["string", "null"], "format": "uri", "maxLength": 3000},
+        "observed_at": {"type": ["string", "null"], "format": "date-time"},
+        "insight": {"type": "string", "minLength": 3, "maxLength": 2000},
+        "applied_to": {"type": "string", "minLength": 2, "maxLength": 1000}
+      }
+    },
+    "deliverable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "platform",
+        "width",
+        "height",
+        "fps",
+        "target_duration_s",
+        "subtitle_mode",
+        "section_ids",
+        "hook_id",
+        "ending_section_id"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "platform": {"type": "string", "minLength": 2, "maxLength": 100},
+        "format": {"enum": ["longform", "short", "reel", "story", "preview", "custom"]},
+        "width": {"type": "integer", "minimum": 320, "multipleOf": 2},
+        "height": {"type": "integer", "minimum": 320, "multipleOf": 2},
+        "fps": {"$ref": "#/$defs/fps"},
+        "target_duration_s": {"type": "number", "exclusiveMinimum": 0},
+        "subtitle_mode": {"enum": ["none", "burned", "sidecar"]},
+        "section_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "hook_id": {"$ref": "#/$defs/id"},
+        "ending_section_id": {"$ref": "#/$defs/id"},
+        "language": {"type": ["string", "null"], "maxLength": 50},
+        "notes": {"type": ["string", "null"], "maxLength": 2000}
+      }
+    }
+  }
+}

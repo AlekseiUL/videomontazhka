@@ -1,0 +1,27 @@
+{
+  "id": "youtube-from-stream-v1",
+  "deliverable": {
+    "platform": "youtube",
+    "aspect": "16:9",
+    "width": 1920,
+    "height": 1080,
+    "fps_policy": "explicit_source_compatible",
+    "subtitles": "none"
+  },
+  "presenter": {
+    "default": "preserve",
+    "allowed": ["rectangle", "circle", "full_frame", "hidden"],
+    "circle_rule": "only_already_circular_isolated_or_user_override"
+  },
+  "brand": {
+    "background": "#070707",
+    "accent": "#FF6A00",
+    "primary": "#FFFFFF",
+    "secondary": "#A8A8A8"
+  },
+  "components": ["title", "editorial_intro", "chapter", "definition", "compare", "process", "callout", "cta"],
+  "transition_default": "hard_cut",
+  "chapter_card_duration_s": [2.5, 4.5],
+  "title_minimum_hold_s": 2.5,
+  "cta_duration_s": [3.5, 5.5]
+}

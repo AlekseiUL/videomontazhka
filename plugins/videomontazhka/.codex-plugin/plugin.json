@@ -1,0 +1,38 @@
+{
+  "name": "videomontazhka",
+  "version": "0.1.0",
+  "description": "Approval-gated, transcript-led local video editing for Codex.",
+  "author": {
+    "name": "SPRUT_AI",
+    "url": "https://github.com/AlekseiUL"
+  },
+  "homepage": "https://github.com/AlekseiUL/videomontazhka",
+  "repository": "https://github.com/AlekseiUL/videomontazhka",
+  "license": "Apache-2.0",
+  "keywords": [
+    "video-editing",
+    "transcription",
+    "semantic-editing",
+    "codex",
+    "ffmpeg"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Видеомонтажка",
+    "shortDescription": "Смысловой монтаж видео с контролем расходов",
+    "longDescription": "Локальный монтажный конвейер: инвентаризация, транскрибация, согласование смысла, монтаж, графика, звук, QA и публикационный пакет.",
+    "developerName": "SPRUT_AI",
+    "category": "Media",
+    "capabilities": [
+      "Local video editing",
+      "Transcript-led editing",
+      "Approval-gated workflow"
+    ],
+    "defaultPrompt": [
+      "Собери из этой папки цельный ролик и сначала покажи смысловой план.",
+      "Сократи стрим без потери смысла и убери слова-паразиты.",
+      "Подготовь монтаж, графику, звук и пакет для YouTube."
+    ],
+    "brandColor": "#FF6A00"
+  }
+}

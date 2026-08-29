@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "diagram-focus",
+  "audited": true,
+  "text_mode": "optional",
+  "asset_types": ["diagram"],
+  "default_duration_s": 3.4,
+  "transparent": true,
+  "experimental": false,
+  "required_media": []
+}

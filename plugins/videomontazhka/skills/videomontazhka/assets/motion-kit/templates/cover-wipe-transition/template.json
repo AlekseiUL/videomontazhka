@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "cover-wipe-transition",
+  "audited": true,
+  "text_mode": "forbidden",
+  "asset_types": ["chapter"],
+  "default_duration_s": 1.1,
+  "transparent": true,
+  "experimental": false,
+  "required_media": []
+}

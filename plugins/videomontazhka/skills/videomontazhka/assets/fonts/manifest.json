@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "policy": "local_only",
+  "families": [
+    {
+      "family": "Unbounded",
+      "role": "expressive_display",
+      "file": "unbounded/Unbounded[wght].ttf",
+      "sha256": "323b511be380c8d474ef030686b71aedde501f8d9cd46da558b7c40454372c3f",
+      "license": "SIL Open Font License 1.1",
+      "license_file": "unbounded/OFL.txt",
+      "license_sha256": "0ffe0a13450d66fcb678824aac041cdc41a3423f153b778feff2167624e67bb2",
+      "source": "https://github.com/google/fonts/tree/main/ofl/unbounded",
+      "cyrillic_basic": true
+    },
+    {
+      "family": "Golos Text",
+      "role": "readable_body",
+      "file": "golos-text/GolosText[wght].ttf",
+      "sha256": "17bb58fb69aec2dfb047a2ebf52534023e9b688c97a6b7ac795b0a72912c2063",
+      "license": "SIL Open Font License 1.1",
+      "license_file": "golos-text/OFL.txt",
+      "license_sha256": "270e8bfc5b8f26a2ca1433cf4d65d6d93771d2131715a57460702c0df4057c06",
+      "source": "https://github.com/google/fonts/tree/main/ofl/golostext",
+      "cyrillic_basic": true
+    },
+    {
+      "family": "JetBrains Mono",
+      "role": "technical_labels_and_data",
+      "file": "jetbrains-mono/JetBrainsMono[wght].ttf",
+      "sha256": "48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda",
+      "license": "SIL Open Font License 1.1",
+      "license_file": "jetbrains-mono/OFL.txt",
+      "license_sha256": "b2fe5e8987594e9ffd1d2ca52a2f5d73eb8335243893c5d6254b5ad69269591d",
+      "source": "https://github.com/google/fonts/tree/main/ofl/jetbrainsmono",
+      "cyrillic_basic": true
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "id": "three-spatial-system",
+  "audited": true,
+  "engine": "three",
+  "text_mode": "optional",
+  "asset_types": ["diagram", "comparison", "process", "b_roll"],
+  "default_duration_s": 3.2,
+  "transparent": true,
+  "experimental": true,
+  "default_enabled": false,
+  "deterministic": true,
+  "required_local_asset": false,
+  "required_flags": ["--enable-experimental-three"],
+  "runtime_files": ["vendor/sprut-three.js"],
+  "license_files": ["licenses/three-MIT.txt"]
+}

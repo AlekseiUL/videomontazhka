@@ -1,0 +1,17 @@
+{
+  "name": "sprut-creative-browser-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "gl-transitions": "1.71.0",
+    "lottie-web": "5.13.0",
+    "pixi-filters": "6.1.5",
+    "pixi.js": "8.19.0",
+    "rough-notation": "0.5.1",
+    "three": "0.185.1"
+  }
+}

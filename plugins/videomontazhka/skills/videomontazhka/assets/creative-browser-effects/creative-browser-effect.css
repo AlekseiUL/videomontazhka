@@ -1,0 +1,63 @@
+@font-face {
+  font-family: "SPRUT Display";
+  src: url("./fonts/unbounded/Unbounded[wght].ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "SPRUT Body";
+  src: url("./fonts/golos-text/GolosText[wght].ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+}
+
+:root {
+  color-scheme: dark;
+  --sprut-background: #070707;
+  --sprut-panel: #121212;
+  --sprut-accent: #FF6A00;
+  --sprut-primary: #FFFFFF;
+  --sprut-secondary: #A8A8A8;
+  --sprut-display: "SPRUT Display", sans-serif;
+  --sprut-body: "SPRUT Body", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: transparent; }
+body { color: var(--sprut-primary); font-family: var(--sprut-body); }
+
+.sprut-creative-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  isolation: isolate;
+}
+
+.sprut-engine-layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sprut-safe { position: absolute; inset: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left); }
+.sprut-approved-label {
+  position: absolute;
+  left: var(--safe-left);
+  bottom: var(--safe-bottom);
+  z-index: 5;
+  max-width: min(72%, 1320px);
+  padding: 18px 24px 20px;
+  border-left: 8px solid var(--sprut-accent);
+  border-radius: 0 18px 18px 0;
+  background: linear-gradient(90deg, rgba(7,7,7,.90), rgba(7,7,7,.55), rgba(7,7,7,0));
+  color: var(--sprut-primary);
+  font-family: var(--sprut-display);
+  font-size: clamp(38px, 4.1vw, 88px);
+  font-weight: 780;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+  text-shadow: 0 8px 26px rgba(0,0,0,.76);
+}
+
+[data-sprut-text-block="hidden"] { display: none !important; }

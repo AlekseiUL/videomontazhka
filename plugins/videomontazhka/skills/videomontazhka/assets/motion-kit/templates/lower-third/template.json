@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "lower-third",
+  "audited": true,
+  "text_mode": "required",
+  "asset_types": ["title"],
+  "default_duration_s": 4.0,
+  "transparent": true,
+  "experimental": false,
+  "required_media": []
+}

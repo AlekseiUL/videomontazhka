@@ -1,0 +1,323 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sprut:creative-treatment-plan:v1",
+  "title": "SPRUT compiled creative treatment plan v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "type",
+    "compiler_version",
+    "map_id",
+    "timeline_order",
+    "network_calls_made",
+    "approval",
+    "controls",
+    "summary",
+    "entries"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "type": {"const": "sprut_creative_treatment_plan"},
+    "compiler_version": {"const": "sprut-creative-treatment-compiler-1"},
+    "map_id": {"const": "sprut-creative-tool-map-v1"},
+    "timeline_order": {
+      "const": "narrative_section_index_then_visual_plan_index"
+    },
+    "network_calls_made": {"const": 0},
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic_plan", "semantic_approval"],
+      "properties": {
+        "semantic_plan": {"$ref": "#/$defs/fileIdentity"},
+        "semantic_approval": {"$ref": "#/$defs/fileIdentity"}
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "router_map",
+        "router",
+        "router_input_schema",
+        "decision_schema",
+        "treatment_schema",
+        "compiler"
+      ],
+      "properties": {
+        "router_map": {"$ref": "#/$defs/fileIdentity"},
+        "router": {"$ref": "#/$defs/fileIdentity"},
+        "router_input_schema": {"$ref": "#/$defs/fileIdentity"},
+        "decision_schema": {"$ref": "#/$defs/fileIdentity"},
+        "treatment_schema": {"$ref": "#/$defs/fileIdentity"},
+        "compiler": {"$ref": "#/$defs/fileIdentity"}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visual_plan_entries",
+        "effect_decisions",
+        "none_decisions",
+        "primary_visuals",
+        "supporting_audio_effects"
+      ],
+      "properties": {
+        "visual_plan_entries": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "effect_decisions": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "none_decisions": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "primary_visuals": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "supporting_audio_effects": {"type": "integer", "minimum": 0, "maximum": 1000}
+      }
+    },
+    "entries": {
+      "type": "array",
+      "maxItems": 1000,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/treatmentEntry"}
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^\\S(?:.*\\S)?$"
+    },
+    "toolId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[a-z][a-z0-9_]{0,79}$"
+    },
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "localPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*://)[^\\u0000\\r\\n]+$"
+    },
+    "fileIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/localPath"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "meaningIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/id"}
+    },
+    "selectedEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_id",
+        "effect_id",
+        "label",
+        "kind",
+        "family",
+        "intensity",
+        "duration_s",
+        "full_frame",
+        "matched_signals",
+        "recipe",
+        "rationale"
+      ],
+      "properties": {
+        "tool_id": {"$ref": "#/$defs/toolId"},
+        "effect_id": {"$ref": "#/$defs/toolId"},
+        "label": {"type": "string", "minLength": 1, "maxLength": 160},
+        "kind": {"enum": ["primary_visual", "support_audio"]},
+        "family": {"$ref": "#/$defs/toolId"},
+        "intensity": {"enum": ["restrained", "medium", "hero"]},
+        "duration_s": {"type": "number", "exclusiveMinimum": 0, "maximum": 300},
+        "full_frame": {"type": "boolean"},
+        "matched_signals": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 80}
+        },
+        "recipe": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "rationale": {"type": "string", "minLength": 1, "maxLength": 1000}
+      }
+    },
+    "density": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "window_start_s",
+        "window_end_s",
+        "primary_events_before",
+        "hero_events_before",
+        "audio_support_events_before",
+        "visual_coverage_ratio_before",
+        "active_visual_layers_before",
+        "limits",
+        "blocks"
+      ],
+      "properties": {
+        "window_start_s": {"type": "number", "minimum": 0},
+        "window_end_s": {"type": "number", "minimum": 0},
+        "primary_events_before": {"type": "integer", "minimum": 0},
+        "hero_events_before": {"type": "integer", "minimum": 0},
+        "audio_support_events_before": {"type": "integer", "minimum": 0},
+        "visual_coverage_ratio_before": {"type": "number", "minimum": 0, "maximum": 1},
+        "active_visual_layers_before": {"type": "integer", "minimum": 0},
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "window_s",
+            "max_primary_events",
+            "max_hero_events",
+            "max_audio_support_events",
+            "max_visual_coverage_ratio",
+            "max_active_visual_layers",
+            "max_supporting_effects"
+          ],
+          "properties": {
+            "window_s": {"type": "number", "exclusiveMinimum": 0},
+            "max_primary_events": {"type": "integer", "minimum": 0},
+            "max_hero_events": {"type": "integer", "minimum": 0},
+            "max_audio_support_events": {"type": "integer", "minimum": 0},
+            "max_visual_coverage_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+            "max_active_visual_layers": {"type": "integer", "minimum": 0},
+            "max_supporting_effects": {"type": "integer", "minimum": 0, "maximum": 1}
+          }
+        },
+        "blocks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 200}
+        }
+      }
+    },
+    "qa": {
+      "enum": [
+        "asset_provenance",
+        "audio_mix_review",
+        "boundary_frame_review",
+        "caption_collision_review",
+        "diagram_legibility_review",
+        "full_preview_user_approval",
+        "matte_edge_review",
+        "motion_stability_review",
+        "transition_asset_qa",
+        "visual_preview_sheet"
+      ]
+    },
+    "treatmentEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeline_index",
+        "section_index",
+        "visual_plan_index",
+        "visual_id",
+        "section_id",
+        "meaning_ids",
+        "asset_type",
+        "purpose",
+        "treatment",
+        "approved_text",
+        "decision_file",
+        "feature_input_sha256",
+        "decision",
+        "none_reason",
+        "primary_effect",
+        "supporting_effects",
+        "density",
+        "required_qa",
+        "guardrails"
+      ],
+      "properties": {
+        "timeline_index": {"type": "integer", "minimum": 0, "maximum": 999},
+        "section_index": {"type": "integer", "minimum": 0, "maximum": 999},
+        "visual_plan_index": {"type": "integer", "minimum": 0, "maximum": 999},
+        "visual_id": {"$ref": "#/$defs/id"},
+        "section_id": {"$ref": "#/$defs/id"},
+        "meaning_ids": {"$ref": "#/$defs/meaningIds"},
+        "asset_type": {
+          "enum": [
+            "none",
+            "title",
+            "chapter",
+            "diagram",
+            "comparison",
+            "process",
+            "quote",
+            "cta",
+            "b_roll"
+          ]
+        },
+        "purpose": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "treatment": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "approved_text": {"type": ["string", "null"], "maxLength": 4000},
+        "decision_file": {"$ref": "#/$defs/fileIdentity"},
+        "feature_input_sha256": {"$ref": "#/$defs/sha256"},
+        "decision": {"enum": ["effect", "none"]},
+        "none_reason": {"type": ["string", "null"], "maxLength": 500},
+        "primary_effect": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/selectedEffect"}
+          ]
+        },
+        "supporting_effects": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {"$ref": "#/$defs/selectedEffect"}
+        },
+        "density": {"$ref": "#/$defs/density"},
+        "required_qa": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/qa"}
+        },
+        "guardrails": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 500}
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"decision": {"const": "effect"}},
+            "required": ["decision"]
+          },
+          "then": {
+            "properties": {
+              "none_reason": {"type": "null"},
+              "primary_effect": {"$ref": "#/$defs/selectedEffect"}
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"decision": {"const": "none"}},
+            "required": ["decision"]
+          },
+          "then": {
+            "properties": {
+              "none_reason": {"type": "string", "minLength": 1},
+              "primary_effect": {"type": "null"},
+              "supporting_effects": {"maxItems": 0},
+              "required_qa": {"maxItems": 0}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

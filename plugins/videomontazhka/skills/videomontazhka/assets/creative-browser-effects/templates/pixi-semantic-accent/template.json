@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "id": "pixi-semantic-accent",
+  "audited": true,
+  "engine": "pixi.js",
+  "text_mode": "optional",
+  "asset_types": ["title", "diagram", "comparison", "process", "quote"],
+  "default_duration_s": 2.8,
+  "transparent": true,
+  "experimental": false,
+  "default_enabled": true,
+  "deterministic": true,
+  "required_local_asset": false,
+  "required_flags": [],
+  "runtime_files": ["vendor/sprut-pixi.js"],
+  "license_files": ["licenses/pixi.js-MIT.txt", "licenses/pixi-filters-MIT.txt"]
+}

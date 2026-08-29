@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-effect.css">
+    <style>
+      #flip_before_after .scene-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+      }
+      #flip_before_after .flip-frame {
+        position: relative;
+        width: 100%;
+        padding: clamp(48px, 5vw, 96px);
+        border-radius: 42px;
+        overflow: hidden;
+      }
+      #flip_before_after .flip-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: clamp(32px, 4vw, 76px);
+        align-items: stretch;
+      }
+      #flip_before_after .flip-grid.layout-grid {
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      }
+      #flip_before_after .flip-grid.is-stacked {
+        grid-template-columns: 1fr;
+      }
+      #flip_before_after .chip {
+        display: flex;
+        align-items: center;
+        min-height: 260px;
+        padding: clamp(34px, 3.2vw, 62px);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 28px;
+        background: rgba(18, 18, 18, 0.96);
+        font-size: clamp(40px, 4.1vw, 82px);
+        line-height: 1.04;
+        overflow-wrap: anywhere;
+        box-shadow: 0 18px 58px rgba(0, 0, 0, 0.42);
+      }
+      #flip_before_after .chip:last-child {
+        border-color: rgba(255, 106, 0, 0.72);
+        box-shadow: inset 9px 0 0 var(--sprut-accent), 0 18px 58px rgba(0, 0, 0, 0.42);
+      }
+      #flip_before_after .connector {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 3;
+        width: 112px;
+        height: 10px;
+        border-radius: 8px;
+        background: var(--sprut-accent);
+        transform: translate(-50%, -50%);
+        transform-origin: center;
+        box-shadow: 0 0 28px rgba(255, 106, 0, 0.46);
+      }
+      #flip_before_after .connector::after {
+        content: "";
+        position: absolute;
+        right: -2px;
+        top: 50%;
+        width: 30px;
+        height: 30px;
+        border-top: 10px solid var(--sprut-accent);
+        border-right: 10px solid var(--sprut-accent);
+        transform: translateY(-50%) rotate(45deg);
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./vendor/Flip.min.js"></script>
+    <script src="./creative-effect-runtime.js"></script>
+  </head>
+  <body>
+    <div id="flip_before_after" class="sprut-gsap-stage" data-composition-id="flip_before_after" data-start="0" data-duration="4" data-track-index="0" data-width="1920" data-height="1080">
+      <div class="scene-content">
+        <div id="flip-frame" class="flip-frame sprut-local-plate">
+          <div id="flip-grid" class="flip-grid is-stacked">
+            <div class="chip sprut-display" data-sprut-fragment="0"></div>
+            <div class="chip sprut-display" data-sprut-fragment="1"></div>
+          </div>
+          <div id="flip-connector" class="connector" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var state = window.SPRUTGSAPCreative.prepare("flip_before_after", "flip_before_after");
+      var FlipPlugin = window.SPRUTGSAPCreative.plugin("Flip");
+      var grid = document.querySelector("#flip-grid");
+      var beforeState = FlipPlugin.getState(".chip");
+      grid.classList.remove("is-stacked");
+      if (state.config.options.layout === "stacked_to_grid") grid.classList.add("layout-grid");
+      var rearrange = FlipPlugin.from(beforeState, {duration: 0.86, ease: "power3.inOut", absolute: true, paused: true});
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#flip-frame", {scale: 0.92, opacity: 0, duration: 0.64, ease: "expo.out"}, 0.16);
+      tl.add(rearrange, 0.46);
+      tl.from("#flip-connector", {scaleX: 0, opacity: 0, duration: 0.38, ease: "back.out(1.45)"}, 0.96);
+      tl.to("#flip-frame", {y: -18, opacity: 0, duration: 0.32, ease: "power3.in"}, window.SPRUTGSAPCreative.finalExitAt(state.duration, 0.32));
+      window.SPRUTGSAPCreative.register("flip_before_after", tl);
+    </script>
+  </body>
+</html>

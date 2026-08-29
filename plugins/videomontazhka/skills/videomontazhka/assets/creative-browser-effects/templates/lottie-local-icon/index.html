@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-browser-effect.css">
+    <style>
+      #lottie-local-icon .icon-shell {
+        position: absolute; left: 50%; top: 43%; width: min(42vw, 620px); height: min(42vw, 620px);
+        transform: translate(-50%, -50%); border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,106,0,.19), rgba(18,18,18,.04) 62%, transparent 72%);
+        filter: drop-shadow(0 20px 48px rgba(0,0,0,.48));
+      }
+      #lottie-local-icon .icon-render { position: absolute; inset: 12%; }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./lottie-data.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-creative-browser-runtime.js"></script>
+    <script src="./vendor/lottie-light.min.js"></script>
+  </head>
+  <body>
+    <div id="lottie-local-icon" class="sprut-creative-stage" data-composition-id="lottie-local-icon" data-start="0" data-duration="2.6" data-track-index="0" data-width="1920" data-height="1080">
+      <div id="lottie-shell" class="icon-shell"><div id="lottie-render" class="icon-render"></div></div>
+      <div id="lottie-label" class="sprut-approved-label" data-sprut-approved-text></div>
+    </div>
+    <script>
+      (function () {
+        "use strict";
+        var prepared = window.SPRUTCreative.prepare("lottie-local-icon");
+        if (!window.lottie || !window.SPRUT_LOTTIE_DATA) throw new Error("local Lottie data or runtime did not load");
+        var effect = prepared.effect;
+        var animation = window.lottie.loadAnimation({
+          container: document.getElementById("lottie-render"),
+          renderer: "svg",
+          autoplay: false,
+          loop: false,
+          animationData: window.SPRUT_LOTTIE_DATA,
+          rendererSettings: {preserveAspectRatio: "xMidYMid meet", progressiveLoad: false}
+        });
+        var state = {progress: 0};
+        var frameSpan = Math.max(1, effect.out_frame - effect.in_frame - 1);
+        function seekLottie() { animation.goToAndStop(effect.in_frame + state.progress * frameSpan, true); }
+        var tl = window.gsap.timeline({paused: true});
+        tl.fromTo("#lottie-shell", {scale: 0.72, opacity: 0}, {scale: 1, opacity: 1, duration: 0.48, ease: "back.out(1.8)"}, 0.14);
+        tl.to(state, {progress: 1, duration: Math.max(0.5, prepared.duration - 0.28), ease: "none", onUpdate: seekLottie}, 0.14);
+        tl.fromTo("#lottie-label", {x: -46, opacity: 0}, {x: 0, opacity: 1, duration: 0.44, ease: "power3.out"}, 0.2);
+        tl.to(["#lottie-shell", "#lottie-label"], {scale: 0.94, opacity: 0, duration: 0.28, ease: "power2.in"}, window.SPRUTCreative.finalExitAt(prepared.duration, 0.28));
+        window.SPRUTCreative.register("lottie-local-icon", tl);
+        seekLottie();
+        window.SPRUT_EFFECT_READY = Promise.resolve(true);
+      })();
+    </script>
+  </body>
+</html>

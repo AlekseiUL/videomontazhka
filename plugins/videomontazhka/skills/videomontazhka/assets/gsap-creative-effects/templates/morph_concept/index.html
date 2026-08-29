@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-effect.css">
+    <style>
+      #morph_concept .scene-content {
+        display: grid;
+        grid-template-columns: minmax(320px, 0.9fr) minmax(520px, 1.6fr);
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+        gap: clamp(42px, 5vw, 100px);
+      }
+      #morph_concept .shape-panel {
+        display: grid;
+        place-items: center;
+        min-height: 420px;
+        border-radius: 42px;
+      }
+      #morph_concept svg {
+        width: min(84%, 520px);
+        overflow: visible;
+        filter: drop-shadow(0 16px 34px rgba(0, 0, 0, 0.42));
+      }
+      #morph_concept .shape {
+        fill: none;
+        stroke: var(--sprut-accent);
+        stroke-width: 24;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      #morph_concept .target {
+        visibility: hidden;
+      }
+      #morph_concept .concept {
+        margin: 0;
+        max-width: 1050px;
+        font-size: clamp(58px, 5.7vw, 118px);
+        line-height: 1.01;
+        text-wrap: balance;
+        overflow-wrap: anywhere;
+        text-shadow: 0 12px 48px rgba(0, 0, 0, 0.64);
+      }
+      #morph_concept .rule {
+        width: 180px;
+        height: 7px;
+        margin-top: 34px;
+        border-radius: 9px;
+        background: var(--sprut-primary);
+        transform-origin: left center;
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./vendor/MorphSVGPlugin.min.js"></script>
+    <script src="./creative-effect-runtime.js"></script>
+  </head>
+  <body>
+    <div id="morph_concept" class="sprut-gsap-stage" data-composition-id="morph_concept" data-start="0" data-duration="3.6" data-track-index="0" data-width="1920" data-height="1080">
+      <div class="scene-content">
+        <div id="shape-panel" class="shape-panel sprut-local-plate">
+          <svg viewBox="0 0 600 480" aria-hidden="true">
+            <path id="morph-shape" class="shape" d="M145 90 H455 Q510 90 510 145 V335 Q510 390 455 390 H145 Q90 390 90 335 V145 Q90 90 145 90 Z"></path>
+            <path id="target-arrow" class="target" d="M80 205 H350 V105 L530 240 L350 375 V275 H80 Z"></path>
+            <path id="target-flow" class="target" d="M75 110 C190 35 270 205 375 125 C455 65 525 140 515 220 C505 305 395 295 345 365 C285 450 140 415 115 320 C95 245 190 220 75 110 Z"></path>
+          </svg>
+        </div>
+        <div>
+          <p id="concept-text" class="concept sprut-display" data-sprut-approved-text></p>
+          <div id="concept-rule" class="rule"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var state = window.SPRUTGSAPCreative.prepare("morph_concept", "morph_concept");
+      window.SPRUTGSAPCreative.plugin("MorphSVGPlugin");
+      var target = state.config.options.target_shape === "flow" ? "#target-flow" : "#target-arrow";
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#shape-panel", {scale: 0.82, opacity: 0, duration: 0.72, ease: "back.out(1.25)"}, 0.16);
+      tl.from("#concept-text", {x: 82, opacity: 0, duration: 0.62, ease: "expo.out"}, 0.25);
+      tl.from("#concept-rule", {scaleX: 0, duration: 0.42, ease: "power4.out"}, 0.52);
+      tl.to("#morph-shape", {morphSVG: target, rotation: 2, transformOrigin: "50% 50%", duration: 0.9, ease: "power3.inOut"}, 0.82);
+      tl.to(["#shape-panel", "#concept-text", "#concept-rule"], {y: -18, opacity: 0, duration: 0.32, stagger: 0.025, ease: "power3.in"}, window.SPRUTGSAPCreative.finalExitAt(state.duration, 0.37));
+      window.SPRUTGSAPCreative.register("morph_concept", tl);
+    </script>
+  </body>
+</html>

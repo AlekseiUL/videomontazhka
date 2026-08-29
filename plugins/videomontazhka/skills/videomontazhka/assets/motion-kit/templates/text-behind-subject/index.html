@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./motion-kit.css">
+    <style>
+      #text-behind-subject .plate {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      #text-behind-subject .background { z-index: 0; }
+      #text-behind-subject .subject-title-shell {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+      }
+      #text-behind-subject .subject-title {
+        max-width: 1460px;
+        color: var(--sprut-primary);
+        font-size: clamp(80px, 9vw, 180px);
+        line-height: 0.94;
+        text-align: center;
+        overflow-wrap: anywhere;
+        text-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+      }
+      #text-behind-subject .foreground { z-index: 2; }
+      #text-behind-subject .accent-line {
+        position: absolute;
+        left: 18%;
+        right: 18%;
+        bottom: 25%;
+        z-index: 3;
+        height: 10px;
+        border-radius: 5px;
+        background: var(--sprut-accent);
+        transform-origin: left center;
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-motion-runtime.js"></script>
+  </head>
+  <body>
+    <div id="text-behind-subject" class="sprut-stage" data-sprut-full-frame="true" data-composition-id="text-behind-subject" data-start="0" data-duration="3.2" data-track-index="0" data-width="1920" data-height="1080">
+      <video class="plate background" data-sprut-media="background" muted playsinline></video>
+      <div class="subject-title-shell">
+        <div id="subject-title" class="subject-title sprut-display" data-sprut-approved-text></div>
+      </div>
+      <video class="plate foreground" data-sprut-media="foreground" muted playsinline></video>
+      <div id="subject-accent" class="accent-line"></div>
+    </div>
+    <script>
+      var state = window.SPRUTMotion.prepare("text-behind-subject");
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#subject-title", {y: 64, scale: 0.95, opacity: 0, duration: 0.66, ease: "expo.out"}, 0.22);
+      tl.from("#subject-accent", {scaleX: 0, opacity: 0, duration: 0.46, ease: "power3.out"}, 0.48);
+      tl.to("#subject-title", {y: -30, opacity: 0, duration: 0.32, ease: "power2.in"}, window.SPRUTMotion.finalExitAt(state.duration, 0.32));
+      tl.to("#subject-accent", {scaleX: 0, opacity: 0, duration: 0.28, ease: "sine.in"}, window.SPRUTMotion.finalExitAt(state.duration, 0.28));
+      window.SPRUTMotion.register("text-behind-subject", tl);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["text-behind-subject"] = tl;
+    </script>
+  </body>
+</html>

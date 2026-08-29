@@ -1,0 +1,510 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprut.local/schemas/edl.schema.json",
+  "title": "SPRUT edit decision list",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "approval_plan_sha256",
+    "deliverable_id",
+    "hook_id",
+    "sources",
+    "output",
+    "ranges",
+    "layout_plan",
+    "subtitle_mode",
+    "audio"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "approval_plan_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "deliverable_id": {"$ref": "#/$defs/id"},
+    "hook_id": {"$ref": "#/$defs/id"},
+    "sources": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"$ref": "#/$defs/id"},
+      "additionalProperties": {"$ref": "#/$defs/safePath"}
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "fps"],
+      "properties": {
+        "width": {"type": "integer", "minimum": 320, "multipleOf": 2},
+        "height": {"type": "integer", "minimum": 320, "multipleOf": 2},
+        "fps": {"$ref": "#/$defs/fps"}
+      }
+    },
+    "ranges": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/range"}
+    },
+    "layout_plan": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/layout"}
+    },
+    "overlays": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/overlay"}
+    },
+    "audio_overlays": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/audioOverlay"}
+    },
+    "subtitle_mode": {"enum": ["none", "burned", "sidecar"]},
+    "subtitles": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/subtitlePath"}
+      ]
+    },
+    "grade": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/safeFilter"}
+      ]
+    },
+    "audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filters"],
+      "properties": {
+        "filters": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {"$ref": "#/$defs/safeFilter"}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"subtitle_mode": {"const": "none"}},
+        "required": ["subtitle_mode"]
+      },
+      "then": {
+        "properties": {"subtitles": {"type": "null"}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"subtitle_mode": {"enum": ["burned", "sidecar"]}},
+        "required": ["subtitle_mode"]
+      },
+      "then": {
+        "required": ["subtitles"],
+        "properties": {"subtitles": {"$ref": "#/$defs/subtitlePath"}}
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^\\S(?:.*\\S)?$"
+    },
+    "fps": {
+      "oneOf": [
+        {"type": "number", "minimum": 20, "maximum": 60},
+        {"type": "string", "pattern": "^[1-9][0-9]*/[1-9][0-9]*$"}
+      ]
+    },
+    "safePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^[^\\u0000\\r\\n]+$"
+    },
+    "subtitlePath": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 4096,
+      "pattern": "^[^\\u0000\\r\\n]+\\.(?:[sS][rR][tT]|[aA][sS][sS]|[sS][sS][aA]|[vV][tT][tT])$"
+    },
+    "safeFilter": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^[^;\\[\\]\\r\\n]+$"
+    },
+    "filterExpression": {
+      "oneOf": [
+        {"type": "number"},
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^;\\[\\]'\\r\\n]+$"
+        }
+      ]
+    },
+    "positiveFilterExpression": {
+      "oneOf": [
+        {"type": "number", "exclusiveMinimum": 0},
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[^;\\[\\]\\r\\n]+$"
+        }
+      ]
+    },
+    "crop": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 1024,
+          "pattern": "^(?:crop=)?[^;\\[\\]\\r\\n]+$"
+        },
+        {
+          "type": "array",
+          "prefixItems": [
+            {"$ref": "#/$defs/positiveFilterExpression"},
+            {"$ref": "#/$defs/positiveFilterExpression"},
+            {"$ref": "#/$defs/filterExpression"},
+            {"$ref": "#/$defs/filterExpression"}
+          ],
+          "items": false,
+          "minItems": 4,
+          "maxItems": 4
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "w": {"$ref": "#/$defs/positiveFilterExpression"},
+            "width": {"$ref": "#/$defs/positiveFilterExpression"},
+            "h": {"$ref": "#/$defs/positiveFilterExpression"},
+            "height": {"$ref": "#/$defs/positiveFilterExpression"},
+            "x": {"$ref": "#/$defs/filterExpression"},
+            "y": {"$ref": "#/$defs/filterExpression"}
+          },
+          "allOf": [
+            {"anyOf": [{"required": ["w"]}, {"required": ["width"]}]},
+            {"anyOf": [{"required": ["h"]}, {"required": ["height"]}]},
+            {"not": {"required": ["w", "width"]}},
+            {"not": {"required": ["h", "height"]}}
+          ]
+        }
+      ]
+    },
+    "normalizedBox": {
+      "oneOf": [
+        {
+          "type": "array",
+          "prefixItems": [
+            {"type": "number", "minimum": 0, "maximum": 1},
+            {"type": "number", "minimum": 0, "maximum": 1},
+            {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+            {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+          ],
+          "items": false,
+          "minItems": 4,
+          "maxItems": 4
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": {"type": "number", "minimum": 0, "maximum": 1},
+            "y": {"type": "number", "minimum": 0, "maximum": 1},
+            "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+            "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+          }
+        }
+      ]
+    },
+    "nullableNormalizedBox": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/normalizedBox"}
+      ]
+    },
+    "outputBox": {
+      "oneOf": [
+        {"$ref": "#/$defs/normalizedBox"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["space", "x", "y", "width", "height"],
+          "properties": {
+            "space": {"const": "normalized"},
+            "x": {"type": "number", "minimum": 0, "maximum": 1},
+            "y": {"type": "number", "minimum": 0, "maximum": 1},
+            "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+            "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+            "z_index": {"type": "integer", "minimum": 0, "maximum": 100}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["space", "x", "y", "width", "height"],
+          "properties": {
+            "space": {"const": "pixels"},
+            "x": {"type": "number", "minimum": 0},
+            "y": {"type": "number", "minimum": 0},
+            "width": {"type": "number", "exclusiveMinimum": 0},
+            "height": {"type": "number", "exclusiveMinimum": 0},
+            "z_index": {"type": "integer", "minimum": 0, "maximum": 100}
+          }
+        }
+      ]
+    },
+    "nullableOutputBox": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/outputBox"}
+      ]
+    },
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "start",
+        "end",
+        "section_id",
+        "meaning_ids",
+        "evidence_ids",
+        "audio_mode",
+        "reason",
+        "transition_after"
+      ],
+      "properties": {
+        "source": {"$ref": "#/$defs/id"},
+        "start": {"type": "number", "minimum": 0},
+        "end": {"type": "number", "exclusiveMinimum": 0},
+        "section_id": {"$ref": "#/$defs/id"},
+        "meaning_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "audio_mode": {"enum": ["source", "mute"]},
+        "quote": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "description": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "reason": {"type": "string", "minLength": 2, "maxLength": 1500},
+        "intentional_pause_reason": {"type": "string", "minLength": 3, "maxLength": 1000},
+        "crop": {"$ref": "#/$defs/crop"},
+        "view_filter": {"$ref": "#/$defs/safeFilter"},
+        "transition_after": {
+          "enum": ["hard_cut", "j_cut", "l_cut", "dissolve", "chapter_bridge", "match_cut"]
+        },
+        "transition_reason": {"type": "string", "minLength": 3, "maxLength": 1000}
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            {"required": ["quote"]},
+            {"required": ["description"]}
+          ]
+        },
+        {
+          "if": {
+            "properties": {
+              "transition_after": {"not": {"const": "hard_cut"}}
+            },
+            "required": ["transition_after"]
+          },
+          "then": {"required": ["transition_reason"]}
+        }
+      ]
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "start", "end", "source_class", "output_shape", "reason"],
+      "properties": {
+        "source": {"$ref": "#/$defs/id"},
+        "start": {"type": "number", "minimum": 0},
+        "end": {"type": "number", "exclusiveMinimum": 0},
+        "source_class": {
+          "enum": ["already_circular", "isolated_subject", "rectangular_with_context", "full_frame_presenter", "screen_only"]
+        },
+        "output_shape": {"enum": ["rectangle", "circle", "full_frame", "hidden", "none"]},
+        "composition": {
+          "enum": ["preserve_source", "presenter_only", "presenter_with_screen", "screen_only"]
+        },
+        "presenter_roi": {"$ref": "#/$defs/nullableNormalizedBox"},
+        "screen_roi": {"$ref": "#/$defs/nullableNormalizedBox"},
+        "important_screen_roi": {"$ref": "#/$defs/nullableNormalizedBox"},
+        "presenter_box": {"$ref": "#/$defs/nullableOutputBox"},
+        "screen_box": {"$ref": "#/$defs/nullableOutputBox"},
+        "caption_safe_box": {"$ref": "#/$defs/nullableOutputBox"},
+        "reason": {"type": "string", "minLength": 3, "maxLength": 1500},
+        "user_override": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              {"required": ["composition"], "properties": {"composition": {"const": "preserve_source"}}},
+              {"not": {"required": ["composition"]}}
+            ]
+          },
+          "then": {
+            "properties": {
+              "presenter_roi": {"type": "null"},
+              "screen_roi": {"type": "null"},
+              "important_screen_roi": {"type": "null"},
+              "presenter_box": {"type": "null"},
+              "screen_box": {"type": "null"},
+              "caption_safe_box": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "anyOf": [
+                  {"required": ["composition"], "properties": {"composition": {"const": "preserve_source"}}},
+                  {"not": {"required": ["composition"]}}
+                ]
+              },
+              {"required": ["source_class"], "properties": {"source_class": {"const": "isolated_subject"}}}
+            ]
+          },
+          "then": {"properties": {"output_shape": {"const": "rectangle"}}}
+        },
+        {
+          "if": {
+            "required": ["composition"],
+            "properties": {"composition": {"const": "presenter_only"}}
+          },
+          "then": {
+            "properties": {
+              "screen_roi": {"type": "null"},
+              "important_screen_roi": {"type": "null"},
+              "screen_box": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["composition", "output_shape"],
+            "properties": {
+              "composition": {"const": "presenter_only"},
+              "output_shape": {"const": "full_frame"}
+            }
+          },
+          "then": {"properties": {"presenter_box": {"type": "null"}}}
+        },
+        {
+          "if": {
+            "required": ["composition"],
+            "properties": {"composition": {"const": "screen_only"}}
+          },
+          "then": {
+            "properties": {
+              "presenter_roi": {"type": "null"},
+              "presenter_box": {"type": "null"}
+            }
+          }
+        }
+      ]
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visual_id",
+        "file",
+        "provenance",
+        "purpose",
+        "section_id",
+        "meaning_ids",
+        "semantic_text",
+        "duration"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "visual_id": {"$ref": "#/$defs/id"},
+        "file": {"$ref": "#/$defs/safePath"},
+        "provenance": {
+          "type": "string",
+          "minLength": 17,
+          "maxLength": 4096,
+          "pattern": "^[^\\u0000\\r\\n]+\\.provenance\\.json$"
+        },
+        "purpose": {"type": "string", "minLength": 2, "maxLength": 1000},
+        "section_id": {"$ref": "#/$defs/id"},
+        "meaning_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "semantic_text": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 1, "maxLength": 4000}
+          ]
+        },
+        "start_in_output": {"type": "number", "minimum": 0},
+        "start": {"type": "number", "minimum": 0},
+        "start_at_range_index": {"type": "integer", "minimum": 0},
+        "start_after_range_index": {"type": "integer", "minimum": 0},
+        "align_to_end": {"const": true},
+        "offset_s": {"type": "number"},
+        "duration": {"type": "number", "exclusiveMinimum": 0},
+        "full_frame": {"type": "boolean"},
+        "width": {"type": "integer", "minimum": 2, "multipleOf": 2},
+        "height": {"type": "integer", "minimum": 2, "multipleOf": 2},
+        "x": {"$ref": "#/$defs/filterExpression"},
+        "y": {"$ref": "#/$defs/filterExpression"},
+        "filter": {"$ref": "#/$defs/safeFilter"},
+        "fit_mode": {"enum": ["contain", "cover", "stretch"]}
+      },
+      "oneOf": [
+        {"required": ["start_in_output"], "not": {"anyOf": [{"required": ["start"]}, {"required": ["start_at_range_index"]}, {"required": ["start_after_range_index"]}, {"required": ["align_to_end"]}, {"required": ["offset_s"]}]}},
+        {"required": ["start"], "not": {"anyOf": [{"required": ["start_in_output"]}, {"required": ["start_at_range_index"]}, {"required": ["start_after_range_index"]}, {"required": ["align_to_end"]}, {"required": ["offset_s"]}]}},
+        {"required": ["start_at_range_index"], "not": {"anyOf": [{"required": ["start_in_output"]}, {"required": ["start"]}, {"required": ["start_after_range_index"]}, {"required": ["align_to_end"]}]}},
+        {"required": ["start_after_range_index"], "not": {"anyOf": [{"required": ["start_in_output"]}, {"required": ["start"]}, {"required": ["start_at_range_index"]}, {"required": ["align_to_end"]}]}},
+        {"required": ["align_to_end"], "not": {"anyOf": [{"required": ["start_in_output"]}, {"required": ["start"]}, {"required": ["start_at_range_index"]}, {"required": ["start_after_range_index"]}]}}
+      ]
+    },
+    "audioOverlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "duration"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "file": {"$ref": "#/$defs/safePath"},
+        "purpose": {"type": "string", "minLength": 2, "maxLength": 1000},
+        "section_id": {"$ref": "#/$defs/id"},
+        "start_in_output": {"type": "number", "minimum": 0},
+        "start": {"type": "number", "minimum": 0},
+        "start_at_range_index": {"type": "integer", "minimum": 0},
+        "start_after_range_index": {"type": "integer", "minimum": 0},
+        "align_to_end": {"const": true},
+        "offset_s": {"type": "number"},
+        "duration": {"type": "number", "exclusiveMinimum": 0},
+        "gain_db": {"type": "number", "minimum": -60, "maximum": 12}
+      },
+      "oneOf": [
+        {"required": ["start_in_output"], "not": {"anyOf": [{"required": ["start"]}, {"required": ["start_at_range_index"]}, {"required": ["start_after_range_index"]}, {"required": ["align_to_end"]}, {"required": ["offset_s"]}]}},
+        {"required": ["start"], "not": {"anyOf": [{"required": ["start_in_output"]}, {"required": ["start_at_range_index"]}, {"required": ["start_after_range_index"]}, {"required": ["align_to_end"]}, {"required": ["offset_s"]}]}},
+        {"required": ["start_at_range_index"], "not": {"anyOf": [{"required": ["start_in_output"]}, {"required": ["start"]}, {"required": ["start_after_range_index"]}, {"required": ["align_to_end"]}]}},
+        {"required": ["start_after_range_index"], "not": {"anyOf": [{"required": ["start_in_output"]}, {"required": ["start"]}, {"required": ["start_at_range_index"]}, {"required": ["align_to_end"]}]}},
+        {"required": ["align_to_end"], "not": {"anyOf": [{"required": ["start_in_output"]}, {"required": ["start"]}, {"required": ["start_at_range_index"]}, {"required": ["start_after_range_index"]}]}}
+      ]
+    }
+  }
+}

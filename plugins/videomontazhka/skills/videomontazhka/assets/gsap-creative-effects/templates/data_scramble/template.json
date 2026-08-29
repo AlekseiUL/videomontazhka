@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "id": "data_scramble",
+  "audited": true,
+  "description": "Resolve one approved technical or data statement from a controlled glyph scramble.",
+  "asset_types": ["title", "quote", "diagram"],
+  "max_words": 32,
+  "transparent": true,
+  "plugin_files": ["ScrambleTextPlugin.min.js"]
+}

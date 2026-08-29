@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "id": "rough-screen-annotation",
+  "audited": true,
+  "engine": "rough-notation",
+  "text_mode": "optional",
+  "asset_types": ["title", "diagram", "comparison", "process"],
+  "default_duration_s": 2.4,
+  "transparent": true,
+  "experimental": false,
+  "default_enabled": true,
+  "deterministic": true,
+  "required_local_asset": false,
+  "required_flags": [],
+  "runtime_files": ["vendor/rough-notation.iife.js"],
+  "license_files": ["licenses/rough-notation-MIT.txt"]
+}

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "kinetic-keyword",
+  "audited": true,
+  "text_mode": "required",
+  "asset_types": ["title", "quote"],
+  "default_duration_s": 2.4,
+  "transparent": true,
+  "experimental": false,
+  "required_media": []
+}

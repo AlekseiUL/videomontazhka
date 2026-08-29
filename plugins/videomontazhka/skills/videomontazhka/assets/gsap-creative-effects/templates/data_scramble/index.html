@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-effect.css">
+    <style>
+      #data_scramble .scene-content {
+        display: flex;
+        align-items: flex-end;
+        width: 100%;
+        height: 100%;
+        padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+      }
+      #data_scramble .data-panel {
+        position: relative;
+        width: min(92%, 1660px);
+        padding: clamp(54px, 5vw, 100px);
+        border-radius: 38px;
+        overflow: hidden;
+      }
+      #data_scramble .grid {
+        position: absolute;
+        inset: 0;
+        opacity: 0.15;
+        background-image: linear-gradient(rgba(255,255,255,.22) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.22) 1px, transparent 1px);
+        background-size: 56px 56px;
+        mask-image: linear-gradient(to right, black, transparent 78%);
+      }
+      #data_scramble .bars {
+        position: absolute;
+        top: 42px;
+        right: 48px;
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        height: 88px;
+      }
+      #data_scramble .bar {
+        width: 13px;
+        border-radius: 8px;
+        background: var(--sprut-accent);
+        transform-origin: center bottom;
+      }
+      #data_scramble .bar:nth-child(1) { height: 34%; }
+      #data_scramble .bar:nth-child(2) { height: 72%; }
+      #data_scramble .bar:nth-child(3) { height: 48%; }
+      #data_scramble .bar:nth-child(4) { height: 100%; }
+      #data_scramble .data-text {
+        position: relative;
+        z-index: 2;
+        margin: 0;
+        max-width: 1480px;
+        font-size: clamp(54px, 5.6vw, 116px);
+        line-height: 1.01;
+        overflow-wrap: anywhere;
+        text-shadow: 0 12px 50px rgba(0, 0, 0, 0.7);
+      }
+      #data_scramble .cursor {
+        display: inline-block;
+        width: 16px;
+        height: 1.02em;
+        margin-left: 16px;
+        vertical-align: -0.12em;
+        background: var(--sprut-accent);
+        transform-origin: center bottom;
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./vendor/ScrambleTextPlugin.min.js"></script>
+    <script src="./creative-effect-runtime.js"></script>
+  </head>
+  <body>
+    <div id="data_scramble" class="sprut-gsap-stage" data-composition-id="data_scramble" data-start="0" data-duration="3.5" data-track-index="0" data-width="1920" data-height="1080">
+      <div class="scene-content">
+        <div id="data-panel" class="data-panel sprut-local-plate">
+          <div class="grid" aria-hidden="true"></div>
+          <div class="bars" aria-hidden="true"><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i></div>
+          <p class="data-text sprut-mono"><span id="data-text" data-sprut-approved-text></span><span id="data-cursor" class="cursor" aria-hidden="true"></span></p>
+        </div>
+      </div>
+    </div>
+    <script>
+      var state = window.SPRUTGSAPCreative.prepare("data_scramble", "data_scramble");
+      window.SPRUTGSAPCreative.plugin("ScrambleTextPlugin");
+      var dataNode = document.querySelector("#data-text");
+      var approvedText = state.config.content.approved_text;
+      dataNode.textContent = "";
+      dataNode.setAttribute("aria-label", approvedText);
+      var chars = state.config.options.charset === "symbols" ? "!<>-_\\/[]{}—=+*^?#" : "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#data-panel", {x: -68, opacity: 0, duration: 0.65, ease: "expo.out"}, 0.16);
+      tl.from(".bar", {scaleY: 0, duration: 0.44, stagger: {amount: 0.26, from: "start"}, ease: "back.out(1.55)"}, 0.28);
+      tl.to("#data-text", {scrambleText: {text: approvedText, chars: chars, revealDelay: 0.08, speed: 0.42, rightToLeft: state.config.options.reveal_order === "end"}, duration: 1.08, ease: "none"}, 0.34);
+      tl.from("#data-cursor", {scaleY: 0, opacity: 0, duration: 0.25, ease: "circ.out"}, 0.47);
+      tl.to("#data-cursor", {opacity: 0.28, duration: 0.24, repeat: 3, yoyo: true, ease: "power1.inOut"}, 1.48);
+      tl.to("#data-panel", {y: -18, opacity: 0, duration: 0.3, ease: "power3.in"}, window.SPRUTGSAPCreative.finalExitAt(state.duration, 0.3));
+      window.SPRUTGSAPCreative.register("data_scramble", tl);
+    </script>
+  </body>
+</html>

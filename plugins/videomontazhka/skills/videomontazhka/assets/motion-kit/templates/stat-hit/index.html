@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./motion-kit.css">
+    <style>
+      #stat-hit .stat-safe { align-items: center; justify-content: center; }
+      #stat-hit .stat-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: min(980px, 88%);
+        padding: 46px 56px 50px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        background: rgba(18, 18, 18, 0.95);
+        box-shadow: 0 24px 72px rgba(0, 0, 0, 0.5);
+      }
+      #stat-hit .stat-card::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0; width: 14px;
+        background: var(--sprut-accent);
+      }
+      #stat-hit .value {
+        color: var(--sprut-primary);
+        font-size: clamp(84px, 9vw, 180px);
+        line-height: 0.92;
+        overflow-wrap: anywhere;
+      }
+      #stat-hit .label {
+        max-width: 860px;
+        color: var(--sprut-secondary);
+        font-size: clamp(24px, 2.2vw, 42px);
+        line-height: 1.2;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-motion-runtime.js"></script>
+  </head>
+  <body>
+    <div id="stat-hit" class="sprut-stage" data-composition-id="stat-hit" data-start="0" data-duration="3" data-track-index="0" data-width="1920" data-height="1080">
+      <div class="sprut-safe stat-safe">
+        <div id="stat-card" class="stat-card">
+          <div id="stat-value" class="value sprut-display sprut-mono" data-sprut-line="0"></div>
+          <div id="stat-label" class="label sprut-body" data-sprut-line="1"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var state = window.SPRUTMotion.prepare("stat-hit");
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#stat-card", {scale: 0.93, opacity: 0, duration: 0.5, ease: "power3.out"}, 0.2);
+      tl.from("#stat-value", {y: 58, opacity: 0, duration: 0.58, ease: "expo.out"}, 0.28);
+      tl.from("#stat-label", {y: 26, opacity: 0, duration: 0.42, ease: "sine.out"}, 0.46);
+      tl.to("#stat-card", {scale: 0.97, opacity: 0, duration: 0.3, ease: "power2.in"}, window.SPRUTMotion.finalExitAt(state.duration, 0.3));
+      window.SPRUTMotion.register("stat-hit", tl);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["stat-hit"] = tl;
+    </script>
+  </body>
+</html>

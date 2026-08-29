@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "id": "kinetic_split_keyword",
+  "audited": true,
+  "description": "Split one approved phrase into a choreographed keyword emphasis.",
+  "asset_types": ["title", "quote"],
+  "max_words": 24,
+  "transparent": true,
+  "plugin_files": ["SplitText.min.js"]
+}

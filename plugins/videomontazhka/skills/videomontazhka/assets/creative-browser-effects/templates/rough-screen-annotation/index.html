@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-browser-effect.css">
+    <style>
+      #rough-screen-annotation .annotation-target { position: absolute; z-index: 2; }
+      #rough-screen-annotation .target-dot {
+        position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px;
+        border: 4px solid var(--sprut-primary); border-radius: 50%; background: var(--sprut-accent);
+        box-shadow: 0 0 30px rgba(255,106,0,.72);
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-creative-browser-runtime.js"></script>
+    <script src="./vendor/rough-notation.iife.js"></script>
+  </head>
+  <body>
+    <div id="rough-screen-annotation" class="sprut-creative-stage" data-composition-id="rough-screen-annotation" data-start="0" data-duration="2.4" data-track-index="0" data-width="1920" data-height="1080">
+      <div id="rough-target" class="annotation-target"><span id="rough-dot" class="target-dot"></span></div>
+      <div id="rough-label" class="sprut-approved-label" data-sprut-approved-text></div>
+    </div>
+    <script>
+      (function () {
+        "use strict";
+        var prepared = window.SPRUTCreative.prepare("rough-screen-annotation");
+        if (!window.RoughNotation) throw new Error("Rough Notation bundle did not load");
+        var effect = prepared.effect;
+        var target = document.getElementById("rough-target");
+        target.style.left = (effect.target.x * 100) + "%";
+        target.style.top = (effect.target.y * 100) + "%";
+        target.style.width = (effect.target.width * 100) + "%";
+        target.style.height = (effect.target.height * 100) + "%";
+        var annotation = window.RoughNotation.annotate(target, {
+          type: effect.annotation_type,
+          color: "#FF6A00",
+          strokeWidth: effect.stroke_width,
+          padding: 8,
+          iterations: 2,
+          multiline: true,
+          animate: false,
+          seed: effect.seed
+        });
+        annotation.show();
+        var paths = document.querySelectorAll(".rough-annotation path");
+        Array.prototype.forEach.call(paths, function (path) {
+          var length = typeof path.getTotalLength === "function" ? path.getTotalLength() : 800;
+          path.style.strokeDasharray = String(length);
+          path.style.strokeDashoffset = String(length);
+        });
+        var tl = window.gsap.timeline({paused: true});
+        tl.fromTo("#rough-dot", {scale: 0, opacity: 0}, {scale: 1, opacity: 1, duration: 0.32, ease: "back.out(2.2)"}, 0.14);
+        tl.to(paths, {strokeDashoffset: 0, duration: 0.68, stagger: 0.08, ease: "power2.out"}, 0.18);
+        tl.fromTo("#rough-label", {x: -42, opacity: 0}, {x: 0, opacity: 1, duration: 0.46, ease: "power3.out"}, 0.22);
+        tl.to(["#rough-label", "#rough-dot", paths], {opacity: 0, duration: 0.26, ease: "power2.in"}, window.SPRUTCreative.finalExitAt(prepared.duration, 0.26));
+        window.SPRUTCreative.register("rough-screen-annotation", tl);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["rough-screen-annotation"] = tl;
+        window.SPRUT_EFFECT_READY = Promise.resolve(true);
+      })();
+    </script>
+  </body>
+</html>

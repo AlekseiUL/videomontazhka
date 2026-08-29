@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sprut:gsap-creative-effect:spec:v1",
+  "title": "SPRUT approval-bound GSAP creative effect request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "visual_id", "effect_type", "composition", "options"],
+  "properties": {
+    "version": {"const": 1},
+    "visual_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "effect_type": {
+      "enum": [
+        "kinetic_split_keyword",
+        "morph_concept",
+        "route_draw",
+        "data_scramble",
+        "flip_before_after"
+      ]
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "fps", "duration_s"],
+      "properties": {
+        "width": {"type": "integer", "minimum": 320, "maximum": 7680, "multipleOf": 2},
+        "height": {"type": "integer", "minimum": 320, "maximum": 7680, "multipleOf": 2},
+        "fps": {"type": "number", "minimum": 20, "maximum": 60},
+        "duration_s": {"type": "number", "minimum": 1.2, "maximum": 12}
+      }
+    },
+    "options": {"type": "object"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "kinetic_split_keyword"}},
+        "required": ["effect_type"]
+      },
+      "then": {
+        "properties": {"options": {"$ref": "#/$defs/kineticOptions"}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "morph_concept"}},
+        "required": ["effect_type"]
+      },
+      "then": {
+        "properties": {"options": {"$ref": "#/$defs/morphOptions"}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "route_draw"}},
+        "required": ["effect_type"]
+      },
+      "then": {
+        "properties": {"options": {"$ref": "#/$defs/routeOptions"}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "data_scramble"}},
+        "required": ["effect_type"]
+      },
+      "then": {
+        "properties": {"options": {"$ref": "#/$defs/scrambleOptions"}}
+      }
+    },
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "flip_before_after"}},
+        "required": ["effect_type"]
+      },
+      "then": {
+        "properties": {"options": {"$ref": "#/$defs/flipOptions"}}
+      }
+    }
+  ],
+  "$defs": {
+    "kineticOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["split", "accent_word_index"],
+      "properties": {
+        "split": {"enum": ["words", "chars"]},
+        "accent_word_index": {"type": "integer", "minimum": 0, "maximum": 127}
+      }
+    },
+    "morphOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_shape"],
+      "properties": {
+        "target_shape": {"enum": ["arrow", "flow"]}
+      }
+    },
+    "routeOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path_style", "auto_rotate"],
+      "properties": {
+        "path_style": {"enum": ["arc", "steps"]},
+        "auto_rotate": {"type": "boolean"}
+      }
+    },
+    "scrambleOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["charset", "reveal_order"],
+      "properties": {
+        "charset": {"enum": ["upper_numeric", "symbols"]},
+        "reveal_order": {"enum": ["start", "end"]}
+      }
+    },
+    "flipOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layout"],
+      "properties": {
+        "layout": {"enum": ["side_by_side", "stacked_to_grid"]}
+      }
+    }
+  }
+}

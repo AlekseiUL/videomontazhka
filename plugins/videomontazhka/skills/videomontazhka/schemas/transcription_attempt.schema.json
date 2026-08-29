@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://videomontazhka.local/schemas/transcription_attempt.schema.json",
+  "title": "Videomontazhka append-only transcription attempt event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "schema_version",
+    "type",
+    "sequence",
+    "recorded_at",
+    "approval_id",
+    "preflight_sha256",
+    "attempt_key",
+    "source_identity",
+    "status",
+    "outcome_code",
+    "previous_record_sha256",
+    "record_sha256"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "schema_version": { "const": "1.0.0" },
+    "type": { "const": "transcription_attempt" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "approval_id": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+    "preflight_sha256": { "$ref": "#/$defs/sha256" },
+    "attempt_key": { "$ref": "#/$defs/sha256" },
+    "source_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "resolved_path", "outside_project", "sha256", "duration_s"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "resolved_path": { "type": "string", "minLength": 1 },
+        "outside_project": { "type": "boolean" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "duration_s": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "status": {
+      "enum": ["attempt_started", "succeeded", "ambiguous_consumed", "failed_consumed"]
+    },
+    "outcome_code": { "type": ["string", "null"] },
+    "previous_record_sha256": {
+      "anyOf": [
+        { "$ref": "#/$defs/sha256" },
+        { "type": "null" }
+      ]
+    },
+    "record_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

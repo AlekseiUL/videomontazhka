@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./motion-kit.css">
+    <style>
+      #screen-callout .callout {
+        position: absolute;
+        left: calc(var(--anchor-x) * 100%);
+        top: calc(var(--anchor-y) * 100%);
+        display: flex;
+        align-items: center;
+        max-width: 620px;
+      }
+      #screen-callout .dot {
+        width: 24px; height: 24px; flex: 0 0 auto;
+        border: 5px solid var(--sprut-primary); border-radius: 50%;
+        background: var(--sprut-accent); box-shadow: 0 0 0 10px rgba(255, 106, 0, 0.2);
+      }
+      #screen-callout .line {
+        width: 90px; height: 4px; flex: 0 0 auto;
+        background: var(--sprut-accent); transform-origin: left center;
+      }
+      #screen-callout .label {
+        max-width: 500px; padding: 18px 24px;
+        border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 14px;
+        background: rgba(18, 18, 18, 0.95); color: var(--sprut-primary);
+        font-size: clamp(24px, 2.15vw, 42px); line-height: 1.15;
+        overflow-wrap: anywhere; box-shadow: 0 16px 44px rgba(0, 0, 0, 0.45);
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-motion-runtime.js"></script>
+  </head>
+  <body>
+    <div id="screen-callout" class="sprut-stage" data-composition-id="screen-callout" data-start="0" data-duration="3.2" data-track-index="0" data-width="1920" data-height="1080">
+      <div id="callout" class="callout">
+        <div id="callout-dot" class="dot"></div>
+        <div id="callout-line" class="line"></div>
+        <div id="callout-label" class="label sprut-body" data-sprut-approved-text></div>
+      </div>
+    </div>
+    <script>
+      var state = window.SPRUTMotion.prepare("screen-callout");
+      state.root.style.setProperty("--anchor-x", String(state.config.layout.anchor_x));
+      state.root.style.setProperty("--anchor-y", String(state.config.layout.anchor_y));
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#callout-dot", {scale: 0, opacity: 0, duration: 0.36, ease: "back.out(1.7)"}, 0.18);
+      tl.from("#callout-line", {scaleX: 0, duration: 0.38, ease: "power3.out"}, 0.28);
+      tl.from("#callout-label", {x: -28, opacity: 0, duration: 0.46, ease: "expo.out"}, 0.4);
+      tl.to("#callout", {opacity: 0, duration: 0.26, ease: "sine.in"}, window.SPRUTMotion.finalExitAt(state.duration, 0.26));
+      window.SPRUTMotion.register("screen-callout", tl);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["screen-callout"] = tl;
+    </script>
+  </body>
+</html>

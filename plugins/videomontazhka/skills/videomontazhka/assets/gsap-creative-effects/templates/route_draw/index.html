@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-effect.css">
+    <style>
+      #route_draw .scene-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+      }
+      #route_draw .route-panel {
+        position: relative;
+        width: 100%;
+        min-height: 650px;
+        padding: 70px 78px;
+        border-radius: 44px;
+        overflow: hidden;
+      }
+      #route_draw .route-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      #route_draw .route-shadow {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.15);
+        stroke-width: 12;
+        stroke-linecap: round;
+      }
+      #route_draw .route-active {
+        fill: none;
+        stroke: var(--sprut-accent);
+        stroke-width: 13;
+        stroke-linecap: round;
+        filter: drop-shadow(0 0 16px rgba(255, 106, 0, 0.46));
+      }
+      #route_draw .marker {
+        width: 32px;
+        height: 32px;
+        border: 6px solid var(--sprut-primary);
+        border-radius: 50%;
+        background: var(--sprut-accent);
+        box-shadow: 0 0 0 10px rgba(255, 106, 0, 0.18);
+        transform: translate(-50%, -50%);
+      }
+      #route_draw .nodes {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: start;
+        gap: 28px;
+        width: 100%;
+        height: 100%;
+        padding-top: 260px;
+      }
+      #route_draw .node {
+        min-height: 160px;
+        padding: 26px 28px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 24px;
+        background: rgba(18, 18, 18, 0.94);
+        font-size: clamp(27px, 2.25vw, 47px);
+        line-height: 1.12;
+        overflow-wrap: anywhere;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.42);
+      }
+      #route_draw .node:nth-child(even) {
+        margin-top: 95px;
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./vendor/DrawSVGPlugin.min.js"></script>
+    <script src="./vendor/MotionPathPlugin.min.js"></script>
+    <script src="./creative-effect-runtime.js"></script>
+  </head>
+  <body>
+    <div id="route_draw" class="sprut-gsap-stage" data-composition-id="route_draw" data-start="0" data-duration="4.2" data-track-index="0" data-width="1920" data-height="1080">
+      <div class="scene-content">
+        <div id="route-panel" class="route-panel sprut-local-plate">
+          <svg class="route-svg" viewBox="0 0 1600 650" preserveAspectRatio="none" aria-hidden="true">
+            <path id="route-shadow" class="route-shadow" d="M120 210 C390 70 500 390 780 220 C1040 60 1210 400 1480 190"></path>
+            <path id="route-path" class="route-active" d="M120 210 C390 70 500 390 780 220 C1040 60 1210 400 1480 190"></path>
+          </svg>
+          <div id="route-marker" class="marker" aria-hidden="true"></div>
+          <div class="nodes">
+            <div class="node sprut-body" data-sprut-fragment="0"></div>
+            <div class="node sprut-body" data-sprut-fragment="1"></div>
+            <div class="node sprut-body" data-sprut-fragment="2"></div>
+            <div class="node sprut-body" data-sprut-fragment="3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var state = window.SPRUTGSAPCreative.prepare("route_draw", "route_draw");
+      window.SPRUTGSAPCreative.plugin("DrawSVGPlugin");
+      window.SPRUTGSAPCreative.plugin("MotionPathPlugin");
+      if (state.config.options.path_style === "steps") {
+        var stepped = "M120 210 H430 V330 H770 V175 H1130 V320 H1480";
+        document.querySelector("#route-shadow").setAttribute("d", stepped);
+        document.querySelector("#route-path").setAttribute("d", stepped);
+      }
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#route-panel", {scale: 0.94, opacity: 0, duration: 0.62, ease: "expo.out"}, 0.16);
+      tl.fromTo("#route-path", {drawSVG: "0%"}, {drawSVG: "100%", duration: 1.18, ease: "power2.inOut"}, 0.34);
+      tl.from(".node", {y: 54, opacity: 0, duration: 0.5, stagger: {amount: 0.42, from: "start"}, ease: "back.out(1.2)"}, 0.48);
+      tl.from("#route-marker", {scale: 0, opacity: 0, duration: 0.28, ease: "circ.out"}, 0.37);
+      tl.to("#route-marker", {motionPath: {path: "#route-path", align: "#route-path", alignOrigin: [0.5, 0.5], autoRotate: state.config.options.auto_rotate}, duration: 1.18, ease: "power2.inOut"}, 0.34);
+      tl.to("#route-panel", {y: -16, opacity: 0, duration: 0.34, ease: "power3.in"}, window.SPRUTGSAPCreative.finalExitAt(state.duration, 0.34));
+      window.SPRUTGSAPCreative.register("route_draw", tl);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sprut:motion-kit:config:v1",
+  "title": "SPRUT Motion Kit instance configuration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "template",
+    "visual_id",
+    "composition",
+    "brand",
+    "fonts",
+    "content",
+    "layout",
+    "media",
+    "runtime"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "template": {
+      "enum": [
+        "kinetic-keyword",
+        "lower-third",
+        "screen-callout",
+        "diagram-focus",
+        "stat-hit",
+        "chapter-bridge-premium",
+        "cover-wipe-transition",
+        "text-behind-subject"
+      ]
+    },
+    "visual_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "fps", "duration_s", "transparent"],
+      "properties": {
+        "width": {"type": "integer", "minimum": 320, "maximum": 7680, "multipleOf": 2},
+        "height": {"type": "integer", "minimum": 320, "maximum": 7680, "multipleOf": 2},
+        "fps": {"type": "number", "minimum": 20, "maximum": 60},
+        "duration_s": {"type": "number", "minimum": 0.5, "maximum": 30},
+        "transparent": {"type": "boolean"}
+      }
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["background", "panel", "accent", "primary", "secondary"],
+      "properties": {
+        "background": {"const": "#070707"},
+        "panel": {"const": "#121212"},
+        "accent": {"const": "#FF6A00"},
+        "primary": {"const": "#FFFFFF"},
+        "secondary": {"const": "#A8A8A8"}
+      }
+    },
+    "fonts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["display", "body", "mono"],
+      "properties": {
+        "display": {"$ref": "#/$defs/font"},
+        "body": {"$ref": "#/$defs/font"},
+        "mono": {"$ref": "#/$defs/font"}
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approved_text", "lines"],
+      "properties": {
+        "approved_text": {"type": ["string", "null"], "maxLength": 4000},
+        "lines": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {"type": "string", "maxLength": 1000}
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["safe_top", "safe_right", "safe_bottom", "safe_left", "anchor_x", "anchor_y", "focus_x", "focus_y", "focus_width", "focus_height"],
+      "properties": {
+        "safe_top": {"type": "integer", "minimum": 0},
+        "safe_right": {"type": "integer", "minimum": 0},
+        "safe_bottom": {"type": "integer", "minimum": 0},
+        "safe_left": {"type": "integer", "minimum": 0},
+        "anchor_x": {"type": "number", "minimum": 0, "maximum": 1},
+        "anchor_y": {"type": "number", "minimum": 0, "maximum": 1},
+        "focus_x": {"type": "number", "minimum": 0, "maximum": 1},
+        "focus_y": {"type": "number", "minimum": 0, "maximum": 1},
+        "focus_width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "focus_height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+      }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["background", "foreground"],
+      "properties": {
+        "background": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/localPath"}]},
+        "foreground": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/localPath"}]}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gsap_file", "network_allowed", "paid_apis"],
+      "properties": {
+        "gsap_file": {"$ref": "#/$defs/localPath"},
+        "network_allowed": {"const": false},
+        "paid_apis": {"type": "array", "maxItems": 0}
+      }
+    }
+  },
+  "$defs": {
+    "localPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*://)[^\\u0000\\r\\n]+$"
+    },
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "file", "license", "license_file", "license_sha256"],
+      "properties": {
+        "family": {"type": "string", "minLength": 2, "maxLength": 100},
+        "file": {"$ref": "#/$defs/localPath"},
+        "license": {"const": "SIL Open Font License 1.1"},
+        "license_file": {"$ref": "#/$defs/localPath"},
+        "license_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

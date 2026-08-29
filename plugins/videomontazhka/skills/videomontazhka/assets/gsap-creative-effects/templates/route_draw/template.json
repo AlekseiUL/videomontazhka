@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "id": "route_draw",
+  "audited": true,
+  "description": "Draw an approved mechanism or sequence and move one focus marker along it.",
+  "asset_types": ["diagram", "process"],
+  "max_words": 36,
+  "transparent": true,
+  "plugin_files": ["DrawSVGPlugin.min.js", "MotionPathPlugin.min.js"]
+}

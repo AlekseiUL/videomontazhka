@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sprut:gsap-creative-effect:config:v1",
+  "title": "Generated offline SPRUT GSAP creative effect config v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "visual_id",
+    "effect_type",
+    "composition",
+    "brand",
+    "fonts",
+    "content",
+    "layout",
+    "options",
+    "runtime"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "visual_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "effect_type": {
+      "enum": [
+        "kinetic_split_keyword",
+        "morph_concept",
+        "route_draw",
+        "data_scramble",
+        "flip_before_after"
+      ]
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "fps", "duration_s", "transparent"],
+      "properties": {
+        "width": {"type": "integer", "minimum": 320, "maximum": 7680, "multipleOf": 2},
+        "height": {"type": "integer", "minimum": 320, "maximum": 7680, "multipleOf": 2},
+        "fps": {"type": "number", "minimum": 20, "maximum": 60},
+        "duration_s": {"type": "number", "minimum": 1.2, "maximum": 12},
+        "transparent": {"const": true}
+      }
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["background", "panel", "accent", "primary", "secondary"],
+      "properties": {
+        "background": {"const": "#070707"},
+        "panel": {"const": "#121212"},
+        "accent": {"const": "#FF6A00"},
+        "primary": {"const": "#FFFFFF"},
+        "secondary": {"const": "#A8A8A8"}
+      }
+    },
+    "fonts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["display", "body", "mono"],
+      "properties": {
+        "display": {"$ref": "#/$defs/font"},
+        "body": {"$ref": "#/$defs/font"},
+        "mono": {"$ref": "#/$defs/font"}
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approved_text", "fragments", "accent_word_index"],
+      "properties": {
+        "approved_text": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "fragments": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {"type": "string", "minLength": 1, "maxLength": 1000}
+        },
+        "accent_word_index": {"type": "integer", "minimum": 0, "maximum": 127}
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["safe_top", "safe_right", "safe_bottom", "safe_left"],
+      "properties": {
+        "safe_top": {"type": "integer", "minimum": 0},
+        "safe_right": {"type": "integer", "minimum": 0},
+        "safe_bottom": {"type": "integer", "minimum": 0},
+        "safe_left": {"type": "integer", "minimum": 0}
+      }
+    },
+    "options": {"type": "object"},
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network_allowed", "paid_apis", "gsap_version", "bundles"],
+      "properties": {
+        "network_allowed": {"const": false},
+        "paid_apis": {"type": "array", "maxItems": 0},
+        "gsap_version": {"const": "3.14.2"},
+        "bundles": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/localPath"}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "kinetic_split_keyword"}},
+        "required": ["effect_type"]
+      },
+      "then": {"properties": {"options": {"$ref": "#/$defs/kineticOptions"}}}
+    },
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "morph_concept"}},
+        "required": ["effect_type"]
+      },
+      "then": {"properties": {"options": {"$ref": "#/$defs/morphOptions"}}}
+    },
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "route_draw"}},
+        "required": ["effect_type"]
+      },
+      "then": {"properties": {"options": {"$ref": "#/$defs/routeOptions"}}}
+    },
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "data_scramble"}},
+        "required": ["effect_type"]
+      },
+      "then": {"properties": {"options": {"$ref": "#/$defs/scrambleOptions"}}}
+    },
+    {
+      "if": {
+        "properties": {"effect_type": {"const": "flip_before_after"}},
+        "required": ["effect_type"]
+      },
+      "then": {"properties": {"options": {"$ref": "#/$defs/flipOptions"}}}
+    }
+  ],
+  "$defs": {
+    "kineticOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["split", "accent_word_index"],
+      "properties": {
+        "split": {"enum": ["words", "chars"]},
+        "accent_word_index": {"type": "integer", "minimum": 0, "maximum": 127}
+      }
+    },
+    "morphOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_shape"],
+      "properties": {"target_shape": {"enum": ["arrow", "flow"]}}
+    },
+    "routeOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path_style", "auto_rotate"],
+      "properties": {
+        "path_style": {"enum": ["arc", "steps"]},
+        "auto_rotate": {"type": "boolean"}
+      }
+    },
+    "scrambleOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["charset", "reveal_order"],
+      "properties": {
+        "charset": {"enum": ["upper_numeric", "symbols"]},
+        "reveal_order": {"enum": ["start", "end"]}
+      }
+    },
+    "flipOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layout"],
+      "properties": {"layout": {"enum": ["side_by_side", "stacked_to_grid"]}}
+    },
+    "localPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*://)[^\\u0000\\r\\n]+$"
+    },
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "file", "license", "license_file", "license_sha256"],
+      "properties": {
+        "family": {"type": "string", "minLength": 2, "maxLength": 100},
+        "file": {"$ref": "#/$defs/localPath"},
+        "license": {"const": "SIL Open Font License 1.1"},
+        "license_file": {"$ref": "#/$defs/localPath"},
+        "license_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

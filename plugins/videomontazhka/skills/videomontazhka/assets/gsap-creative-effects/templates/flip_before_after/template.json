@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "id": "flip_before_after",
+  "audited": true,
+  "description": "Rearrange two approved text fragments to express a before/after or structural change.",
+  "asset_types": ["comparison", "process"],
+  "max_words": 36,
+  "transparent": true,
+  "plugin_files": ["Flip.min.js"]
+}

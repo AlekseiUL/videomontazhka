@@ -1,0 +1,157 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-contracts:
+    name: Offline contracts and tests
+    runs-on: macos-14
+    timeout-minutes: 20
+    env:
+      ELEVENLABS_API_KEY: ""
+      PYTHONDONTWRITEBYTECODE: "1"
+      VIDEOMONTAZHKA_HOME: "${{ runner.temp }}/Videomontazhka"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse every JSON document
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          files = sorted(
+              path for path in Path(".").rglob("*.json")
+              if ".git" not in path.parts
+          )
+          assert files, "no JSON files found"
+          for path in files:
+              with path.open(encoding="utf-8") as handle:
+                  json.load(handle)
+          print(f"validated {len(files)} JSON files")
+          PY
+
+      - name: Validate plugin, marketplace and skill contracts
+        run: |
+          python3 - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          root = Path.cwd()
+          plugin_root = root / "plugins/videomontazhka"
+          manifest = json.loads((plugin_root / ".codex-plugin/plugin.json").read_text())
+          assert manifest["name"] == "videomontazhka"
+          assert re.fullmatch(r"\d+\.\d+\.\d+", manifest["version"])
+          assert manifest["license"] == "Apache-2.0"
+          assert (plugin_root / manifest["skills"]).is_dir()
+
+          marketplace = json.loads((root / ".agents/plugins/marketplace.json").read_text())
+          records = [item for item in marketplace["plugins"] if item["name"] == "videomontazhka"]
+          assert len(records) == 1
+          record = records[0]
+          assert record["policy"]["installation"] == "AVAILABLE"
+          assert record["policy"]["authentication"] == "ON_USE"
+          assert record["category"]
+
+          skill = plugin_root / "skills/videomontazhka/SKILL.md"
+          text = skill.read_text(encoding="utf-8")
+          assert text.startswith("---\n")
+          end = text.find("\n---\n", 4)
+          assert end > 4, "SKILL.md frontmatter is incomplete"
+          frontmatter = text[4:end]
+          assert re.search(r"(?m)^name:\s*videomontazhka\s*$", frontmatter)
+          description = re.search(r"(?m)^description:\s*(.+)$", frontmatter)
+          assert description and "TODO" not in description.group(1)
+          assert "[TO" + "DO" not in text
+
+          agent = (plugin_root / "skills/videomontazhka/agents/openai.yaml").read_text()
+          assert "$videomontazhka" in agent
+          print("plugin, marketplace and skill contracts: PASS")
+          PY
+
+      - name: Check relative Markdown links
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          failures = []
+          for document in Path(".").rglob("*.md"):
+              if ".git" in document.parts:
+                  continue
+              text = document.read_text(encoding="utf-8")
+              for raw in re.findall(r"\[[^]]*\]\(([^)]+)\)", text):
+                  target = raw.strip().strip("<>").split("#", 1)[0]
+                  if not target or "://" in target or target.startswith("mailto:"):
+                      continue
+                  resolved = (document.parent / target).resolve()
+                  if not resolved.exists():
+                      failures.append(f"{document}: {raw}")
+          assert not failures, "broken relative links:\n" + "\n".join(failures)
+          print("relative Markdown links: PASS")
+          PY
+
+      - name: Reject workstation paths, committed secrets and large binaries
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          forbidden = (
+              "/Users/" + "aleksejulanov",
+              "SPRUT Video Studio" + "/runtime",
+              "video-use/" + ".venv",
+          )
+          failures = []
+          roots = [Path("plugins"), Path(".agents")]
+          for base in roots:
+              for path in base.rglob("*"):
+                  if not path.is_file():
+                      continue
+                  if path.name == "test_portability.py":
+                      # This regression test intentionally stores forbidden
+                      # sentinel strings and asserts that product code does not.
+                      continue
+                  try:
+                      text = path.read_text(encoding="utf-8")
+                  except UnicodeDecodeError:
+                      continue
+                  for needle in forbidden:
+                      if needle in text:
+                          failures.append(f"{path}: forbidden path marker {needle!r}")
+                  if re.search(r"(?m)^\s*ELEVENLABS_API_KEY\s*=\s*\S+", text):
+                      failures.append(f"{path}: non-empty ElevenLabs key-like assignment")
+          for path in Path(".").rglob("*"):
+              if not path.is_file() or ".git" in path.parts:
+                  continue
+              if path.suffix == ".pyc" or "__pycache__" in path.parts:
+                  failures.append(f"{path}: compiled Python cache must not be tracked")
+              if path.stat().st_size > 10 * 1024 * 1024:
+                  failures.append(f"{path}: file is larger than 10 MiB")
+          assert not failures, "repository hygiene failures:\n" + "\n".join(failures)
+          print("repository hygiene: PASS")
+          PY
+
+      - name: Compile Python without installing dependencies
+        run: python3 -m compileall -q plugins/videomontazhka/skills/videomontazhka/scripts plugins/videomontazhka/skills/videomontazhka/tests
+
+      - name: Run standard-library contract tests
+        run: |
+          python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_portability.py'
+          python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_runtime_paths.py'
+          python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_transcription_approval_gate.py'
+          python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_transcription_path_safety.py'
+          python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_font_pack.py'
+          python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_mixed_evidence.py'
+          python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_external_visual_provenance.py'
+
+      - name: Assert tests never require an API key
+        run: test -z "$ELEVENLABS_API_KEY"

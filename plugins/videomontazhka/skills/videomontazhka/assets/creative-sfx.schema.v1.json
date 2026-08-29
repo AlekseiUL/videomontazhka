@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprut.ai/schemas/creative-sfx.schema.v1.json",
+  "title": "SPRUT deterministic creative SFX specification",
+  "type": "object",
+  "required": [
+    "version",
+    "preset",
+    "gain_db",
+    "seed",
+    "purpose"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "preset": {
+      "enum": [
+        "semantic_hit",
+        "soft_pop",
+        "ui_tick",
+        "digital_reveal",
+        "transition_whoosh",
+        "reverse_swell",
+        "sub_drop",
+        "glitch_accent",
+        "marker_stroke"
+      ]
+    },
+    "duration_s": {
+      "type": "number",
+      "minimum": 0.06,
+      "maximum": 3.0
+    },
+    "gain_db": {
+      "type": "number",
+      "minimum": -60.0,
+      "maximum": -6.0
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "intensity": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "brightness": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "stereo_width": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "section_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "rhythm_anchor_s": {
+      "type": "number",
+      "minimum": 0.0
+    },
+    "anchor_alignment": {
+      "enum": ["start_at_anchor", "end_at_anchor"]
+    }
+  },
+  "additionalProperties": false
+}

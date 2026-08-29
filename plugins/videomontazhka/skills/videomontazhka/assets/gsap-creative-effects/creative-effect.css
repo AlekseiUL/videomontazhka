@@ -1,0 +1,64 @@
+:root {
+  --sprut-bg: #070707;
+  --sprut-panel: #121212;
+  --sprut-accent: #ff6a00;
+  --sprut-primary: #ffffff;
+  --sprut-secondary: #a8a8a8;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  color: var(--sprut-primary);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+.sprut-gsap-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.sprut-gsap-stage *,
+.sprut-gsap-stage *::before,
+.sprut-gsap-stage *::after {
+  box-sizing: border-box;
+}
+
+.sprut-display {
+  font-family: "SPRUT Display", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.sprut-body {
+  font-family: "SPRUT Body", sans-serif;
+  font-weight: 430;
+}
+
+.sprut-mono {
+  font-family: "SPRUT Mono", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-sprut-hidden="true"] {
+  display: none !important;
+}
+
+.sprut-local-plate {
+  background: rgba(7, 7, 7, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 22px 80px rgba(0, 0, 0, 0.52);
+}

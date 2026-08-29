@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://videomontazhka.local/schemas/transcription_preflight.schema.json",
+  "title": "Videomontazhka transcription preflight",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "schema_version",
+    "type",
+    "status",
+    "preflight_id",
+    "created_at",
+    "provider",
+    "model_id",
+    "language",
+    "num_speakers",
+    "source_manifest",
+    "request",
+    "request_sha256",
+    "privacy",
+    "usage_estimate",
+    "inventory",
+    "visual_only_sources_skipped",
+    "next_action"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "schema_version": { "const": "1.1.0" },
+    "type": { "const": "transcription_preflight" },
+    "status": { "const": "awaiting_explicit_approval" },
+    "preflight_id": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "provider": { "const": "elevenlabs" },
+    "model_id": { "const": "scribe_v1" },
+    "language": { "type": ["string", "null"], "minLength": 1 },
+    "num_speakers": {
+      "anyOf": [
+        { "type": "integer", "minimum": 1, "maximum": 32 },
+        { "type": "null" }
+      ]
+    },
+    "source_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "source_manifest_sha256",
+        "provider",
+        "model_id",
+        "language",
+        "num_speakers",
+        "sources"
+      ],
+      "properties": {
+        "version": { "const": 1 },
+        "source_manifest_sha256": { "$ref": "#/$defs/sha256" },
+        "provider": { "const": "elevenlabs" },
+        "model_id": { "const": "scribe_v1" },
+        "language": { "type": ["string", "null"], "minLength": 1 },
+        "num_speakers": {
+          "anyOf": [
+            { "type": "integer", "minimum": 1, "maximum": 32 },
+            { "type": "null" }
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/requestSource" }
+        }
+      }
+    },
+    "request_sha256": { "$ref": "#/$defs/sha256" },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_upload", "disclosure", "disclosure_sha256"],
+      "properties": {
+        "external_upload": { "const": true },
+        "disclosure": { "type": "string", "minLength": 1 },
+        "disclosure_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "usage_estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit",
+        "currency_quote_included",
+        "billable_source_ids",
+        "cached_source_ids",
+        "billable_audio_seconds",
+        "estimated_billable_minutes",
+        "note"
+      ],
+      "properties": {
+        "unit": { "const": "source_audio_minute" },
+        "currency_quote_included": { "const": false },
+        "billable_source_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/sourceId" }
+        },
+        "cached_source_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/sourceId" }
+        },
+        "billable_audio_seconds": { "type": "number", "minimum": 0 },
+        "estimated_billable_minutes": { "type": "number", "minimum": 0 },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "filename", "resolved_path", "outside_project", "duration_s", "sha256", "cached", "will_upload", "cache_reason"],
+        "properties": {
+          "id": { "$ref": "#/$defs/sourceId" },
+          "filename": { "type": "string", "minLength": 1 },
+          "resolved_path": { "type": "string", "minLength": 1 },
+          "outside_project": { "type": "boolean" },
+          "duration_s": { "type": "number", "exclusiveMinimum": 0 },
+          "sha256": { "$ref": "#/$defs/sha256" },
+          "cached": { "type": "boolean" },
+          "will_upload": { "type": "boolean" },
+          "cache_reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "visual_only_sources_skipped": { "type": "integer", "minimum": 0 },
+    "next_action": { "type": "string", "minLength": 1 }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[^/\\\\]+$"
+    },
+    "requestSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "manifest_path", "resolved_path", "outside_project", "sha256", "size_bytes", "mtime_ns", "duration_s", "cached", "will_upload", "cache_reason"],
+      "properties": {
+        "id": { "$ref": "#/$defs/sourceId" },
+        "manifest_path": { "type": "string", "minLength": 1 },
+        "resolved_path": { "type": "string", "minLength": 1 },
+        "outside_project": { "type": "boolean" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "size_bytes": { "type": "integer", "minimum": 0 },
+        "mtime_ns": { "type": "integer", "minimum": 0 },
+        "duration_s": { "type": "number", "exclusiveMinimum": 0 },
+        "cached": { "type": "boolean" },
+        "will_upload": { "type": "boolean" },
+        "cache_reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

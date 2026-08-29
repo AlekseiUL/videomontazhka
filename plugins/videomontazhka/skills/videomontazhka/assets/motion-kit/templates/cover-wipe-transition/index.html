@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./motion-kit.css">
+    <style>
+      #cover-wipe-transition .wipe {
+        position: absolute;
+        top: 0;
+        width: 112%;
+        height: 100%;
+        left: -6%;
+        will-change: transform;
+      }
+      #cover-wipe-transition .wipe-dark { background: var(--sprut-panel); }
+      #cover-wipe-transition .wipe-orange {
+        background: var(--sprut-accent);
+        clip-path: polygon(0 0, 95% 0, 100% 100%, 5% 100%);
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-motion-runtime.js"></script>
+  </head>
+  <body>
+    <div id="cover-wipe-transition" class="sprut-stage" data-composition-id="cover-wipe-transition" data-start="0" data-duration="1.1" data-track-index="0" data-width="1920" data-height="1080">
+      <div id="wipe-dark" class="wipe wipe-dark" data-layout-allow-overflow></div>
+      <div id="wipe-orange" class="wipe wipe-orange" data-layout-allow-overflow></div>
+    </div>
+    <script>
+      var state = window.SPRUTMotion.prepare("cover-wipe-transition");
+      var tl = window.gsap.timeline({paused: true});
+      tl.fromTo("#wipe-dark", {xPercent: -112}, {xPercent: 0, duration: 0.32, ease: "power3.inOut"}, 0.08);
+      tl.fromTo("#wipe-orange", {xPercent: -112}, {xPercent: 0, duration: 0.32, ease: "power3.inOut"}, 0.14);
+      tl.to("#wipe-dark", {xPercent: 112, duration: 0.32, ease: "power3.inOut"}, Math.max(0.5, state.duration - 0.42));
+      tl.to("#wipe-orange", {xPercent: 112, duration: 0.32, ease: "power3.inOut"}, Math.max(0.56, state.duration - 0.36));
+      window.SPRUTMotion.register("cover-wipe-transition", tl);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["cover-wipe-transition"] = tl;
+    </script>
+  </body>
+</html>

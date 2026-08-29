@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "chapter-bridge-premium",
+  "audited": true,
+  "text_mode": "required",
+  "asset_types": ["chapter"],
+  "default_duration_s": 3.6,
+  "transparent": false,
+  "experimental": false,
+  "required_media": []
+}

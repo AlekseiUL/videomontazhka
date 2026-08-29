@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sprut:creative-router:input:v1",
+  "title": "SPRUT creative tool router input v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "binding",
+    "scene",
+    "timeline",
+    "available_tools"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visual_id",
+        "semantic_plan_sha256",
+        "approval_sha256",
+        "section_id",
+        "meaning_ids"
+      ],
+      "properties": {
+        "visual_id": {"$ref": "#/$defs/id"},
+        "semantic_plan_sha256": {"$ref": "#/$defs/sha256"},
+        "approval_sha256": {"$ref": "#/$defs/sha256"},
+        "section_id": {"$ref": "#/$defs/id"},
+        "meaning_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        }
+      }
+    },
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_s",
+        "duration_s",
+        "semantic_role",
+        "signals",
+        "content_density",
+        "screen_priority",
+        "presenter_geometry",
+        "desired_intensity",
+        "scene_flags",
+        "audio"
+      ],
+      "properties": {
+        "start_s": {"type": "number", "minimum": 0, "maximum": 86400},
+        "duration_s": {"type": "number", "exclusiveMinimum": 0, "maximum": 300},
+        "semantic_role": {
+          "enum": [
+            "hook",
+            "definition",
+            "explanation",
+            "comparison",
+            "process",
+            "evidence",
+            "demonstration",
+            "payoff",
+            "chapter",
+            "transition",
+            "cta"
+          ]
+        },
+        "signals": {
+          "type": "array",
+          "maxItems": 24,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/signal"}
+        },
+        "content_density": {"enum": ["low", "medium", "high"]},
+        "screen_priority": {"enum": ["none", "context", "important"]},
+        "presenter_geometry": {
+          "enum": [
+            "none",
+            "circle",
+            "rectangle",
+            "full_frame",
+            "isolated_subject"
+          ]
+        },
+        "desired_intensity": {"enum": ["restrained", "medium", "hero"]},
+        "scene_flags": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "experimental_effect_allowed",
+              "person_matte_allowed",
+              "screen_full_frame_visual_approved",
+              "transition_renderer_verified"
+            ]
+          }
+        },
+        "audio": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "speech_present",
+            "music_present",
+            "beat_map_available",
+            "sfx_allowed"
+          ],
+          "properties": {
+            "speech_present": {"type": "boolean"},
+            "music_present": {"type": "boolean"},
+            "beat_map_available": {"type": "boolean"},
+            "sfx_allowed": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deliverable_duration_s", "prior_effects"],
+      "properties": {
+        "deliverable_duration_s": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 86400
+        },
+        "prior_effects": {
+          "type": "array",
+          "maxItems": 2000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tool_id",
+              "effect_id",
+              "start_s",
+              "end_s",
+              "intensity",
+              "layer_count"
+            ],
+            "properties": {
+              "tool_id": {"$ref": "#/$defs/toolId"},
+              "effect_id": {"$ref": "#/$defs/toolId"},
+              "start_s": {"type": "number", "minimum": 0, "maximum": 86400},
+              "end_s": {"type": "number", "exclusiveMinimum": 0, "maximum": 86400},
+              "intensity": {"enum": ["restrained", "medium", "hero"]},
+              "layer_count": {"type": "integer", "minimum": 0, "maximum": 8}
+            }
+          }
+        }
+      }
+    },
+    "available_tools": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool_id", "status"],
+        "properties": {
+          "tool_id": {"$ref": "#/$defs/toolId"},
+          "status": {"enum": ["ready", "experimental", "unavailable"]}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^\\S(?:.*\\S)?$"
+    },
+    "toolId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[a-z][a-z0-9_]{0,79}$"
+    },
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "signal": {
+      "enum": [
+        "abstract_system",
+        "action_cta",
+        "cause_effect",
+        "chapter_change",
+        "code_or_ui_detail",
+        "comparison_contrast",
+        "concept_icon",
+        "definition_reveal",
+        "diagram_relationship",
+        "digital_error",
+        "emotional_payoff",
+        "formal_logic",
+        "freeze_frame_payoff",
+        "geometry_match",
+        "hide_weak_cut",
+        "identity_context",
+        "keyword_emphasis",
+        "music_rhythm",
+        "ordered_steps",
+        "screen_target",
+        "shot_local_reframe",
+        "source_quote",
+        "spatial_depth",
+        "speaker_foreground_layering",
+        "statistic_payoff",
+        "time_place_change",
+        "title_scope",
+        "transition_motivated",
+        "transformation_relationship"
+      ]
+    }
+  }
+}

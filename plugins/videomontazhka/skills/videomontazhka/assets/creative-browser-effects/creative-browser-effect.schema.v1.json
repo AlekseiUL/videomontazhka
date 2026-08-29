@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sprut:creative-browser-effect:config:v1",
+  "title": "SPRUT creative browser effect instance configuration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "visual_id", "composition", "brand", "fonts", "content", "layout", "effect", "runtime"],
+  "properties": {
+    "version": {"const": 1},
+    "visual_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "fps", "duration_s", "transparent"],
+      "properties": {
+        "width": {"type": "integer", "minimum": 320, "maximum": 7680, "multipleOf": 2},
+        "height": {"type": "integer", "minimum": 320, "maximum": 7680, "multipleOf": 2},
+        "fps": {"type": "number", "minimum": 20, "maximum": 60},
+        "duration_s": {"type": "number", "minimum": 0.5, "maximum": 30},
+        "transparent": {"const": true}
+      }
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["background", "panel", "accent", "primary", "secondary"],
+      "properties": {
+        "background": {"const": "#070707"},
+        "panel": {"const": "#121212"},
+        "accent": {"const": "#FF6A00"},
+        "primary": {"const": "#FFFFFF"},
+        "secondary": {"const": "#A8A8A8"}
+      }
+    },
+    "fonts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["display", "body", "mono"],
+      "properties": {
+        "display": {"$ref": "#/$defs/font"},
+        "body": {"$ref": "#/$defs/font"},
+        "mono": {"$ref": "#/$defs/font"}
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approved_text", "lines"],
+      "properties": {
+        "approved_text": {"type": ["string", "null"], "maxLength": 4000},
+        "lines": {"type": "array", "maxItems": 8, "items": {"type": "string", "minLength": 1, "maxLength": 1000}}
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["safe_top", "safe_right", "safe_bottom", "safe_left"],
+      "properties": {
+        "safe_top": {"type": "integer", "minimum": 0},
+        "safe_right": {"type": "integer", "minimum": 0},
+        "safe_bottom": {"type": "integer", "minimum": 0},
+        "safe_left": {"type": "integer", "minimum": 0}
+      }
+    },
+    "effect": {
+      "oneOf": [
+        {"$ref": "#/$defs/pixiEffect"},
+        {"$ref": "#/$defs/roughEffect"},
+        {"$ref": "#/$defs/lottieEffect"},
+        {"$ref": "#/$defs/threeEffect"}
+      ]
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_id", "runtime_manifest_file", "runtime_manifest_sha256", "engine_file", "engine_license_files", "gsap_file", "network_allowed", "paid_apis", "remotion"],
+      "properties": {
+        "runtime_id": {"const": "sprut-creative-browser-v1"},
+        "runtime_manifest_file": {"$ref": "#/$defs/localPath"},
+        "runtime_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "engine_file": {"$ref": "#/$defs/localPath"},
+        "engine_license_files": {"type": "array", "minItems": 1, "maxItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/localPath"}},
+        "gsap_file": {"$ref": "#/$defs/localPath"},
+        "network_allowed": {"const": false},
+        "paid_apis": {"type": "array", "maxItems": 0},
+        "remotion": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "localPath": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*://)[^\\u0000\\r\\n]+$"},
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "file", "license", "license_file", "license_sha256"],
+      "properties": {
+        "family": {"type": "string", "minLength": 2, "maxLength": 100},
+        "file": {"$ref": "#/$defs/localPath"},
+        "license": {"const": "SIL Open Font License 1.1"},
+        "license_file": {"$ref": "#/$defs/localPath"},
+        "license_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {"type": "number", "minimum": 0, "maximum": 1},
+        "y": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": {"type": "number", "minimum": 0, "maximum": 1},
+        "y": {"type": "number", "minimum": 0, "maximum": 1},
+        "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+      }
+    },
+    "pixiEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "seed", "mode", "center", "particle_count"],
+      "properties": {
+        "type": {"const": "pixi-semantic-accent"},
+        "seed": {"type": "integer", "minimum": 1, "maximum": 2147483646},
+        "mode": {"enum": ["shockwave", "particles", "glow", "combined"]},
+        "center": {"$ref": "#/$defs/point"},
+        "particle_count": {"type": "integer", "minimum": 8, "maximum": 96}
+      }
+    },
+    "roughEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "seed", "annotation_type", "target", "stroke_width"],
+      "properties": {
+        "type": {"const": "rough-screen-annotation"},
+        "seed": {"type": "integer", "minimum": 1, "maximum": 2147483646},
+        "annotation_type": {"enum": ["underline", "box", "circle", "highlight", "bracket"]},
+        "target": {"$ref": "#/$defs/region"},
+        "stroke_width": {"type": "integer", "minimum": 2, "maximum": 16}
+      }
+    },
+    "lottieEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "source_file", "source_sha256", "rights_attestation", "renderer", "animation_data_file", "in_frame", "out_frame", "frame_rate"],
+      "properties": {
+        "type": {"const": "lottie-local-icon"},
+        "source_file": {"$ref": "#/$defs/localPath"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "rights_attestation": {"const": "user_owned"},
+        "renderer": {"const": "svg"},
+        "animation_data_file": {"const": "lottie-data.js"},
+        "in_frame": {"type": "number", "minimum": 0, "maximum": 100000},
+        "out_frame": {"type": "number", "exclusiveMinimum": 0, "maximum": 100000},
+        "frame_rate": {"type": "number", "exclusiveMinimum": 0, "maximum": 120}
+      }
+    },
+    "threeEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "seed", "enabled", "experimental", "node_count"],
+      "properties": {
+        "type": {"const": "three-spatial-system"},
+        "seed": {"type": "integer", "minimum": 1, "maximum": 2147483646},
+        "enabled": {"const": true},
+        "experimental": {"const": true},
+        "node_count": {"type": "integer", "minimum": 4, "maximum": 24}
+      }
+    }
+  }
+}

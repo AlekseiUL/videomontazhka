@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://videomontazhka.local/schemas/transcription_approval.schema.json",
+  "title": "Videomontazhka transcription approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "schema_version",
+    "type",
+    "status",
+    "approval_id",
+    "approval_nonce",
+    "recorded_at",
+    "preflight_id",
+    "preflight_file",
+    "preflight_sha256",
+    "request_sha256",
+    "provider",
+    "model_id",
+    "max_billable_minutes",
+    "upload_disclosure_acknowledged",
+    "disclosure_sha256",
+    "user_quote",
+    "user_quote_sha256",
+    "approved_upload_source_ids",
+    "binding_sha256"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "schema_version": { "const": "1.1.0" },
+    "type": { "const": "transcription_approval" },
+    "status": { "const": "approved" },
+    "approval_id": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+    "approval_nonce": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "preflight_id": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+    "preflight_file": { "const": "transcription_preflight.json" },
+    "preflight_sha256": { "$ref": "#/$defs/sha256" },
+    "request_sha256": { "$ref": "#/$defs/sha256" },
+    "provider": { "const": "elevenlabs" },
+    "model_id": { "const": "scribe_v1" },
+    "max_billable_minutes": { "type": "number", "minimum": 0 },
+    "upload_disclosure_acknowledged": { "const": true },
+    "disclosure_sha256": { "$ref": "#/$defs/sha256" },
+    "user_quote": { "type": "string", "minLength": 1 },
+    "user_quote_sha256": { "$ref": "#/$defs/sha256" },
+    "approved_upload_source_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160,
+        "pattern": "^[^/\\\\]+$"
+      }
+    },
+    "binding_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

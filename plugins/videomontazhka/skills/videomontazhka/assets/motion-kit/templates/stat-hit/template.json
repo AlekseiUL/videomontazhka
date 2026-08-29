@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "stat-hit",
+  "audited": true,
+  "text_mode": "required",
+  "asset_types": ["title", "diagram", "quote"],
+  "default_duration_s": 3.0,
+  "transparent": true,
+  "experimental": false,
+  "required_media": []
+}

@@ -1,0 +1,12 @@
+Видеомонтажка
+Copyright 2026 SPRUT_AI contributors
+
+This product includes original work licensed under the Apache License 2.0.
+
+The transcript-led editing workflow and portions of the implementation were
+derived from video-use, Copyright (c) 2026 Browser Use, under the MIT License.
+The complete upstream license is provided in
+third_party/licenses/video-use-MIT.txt.
+
+Bundled fonts retain their original copyright notices and SIL Open Font
+License 1.1 texts inside each font directory. See THIRD_PARTY_NOTICES.md.

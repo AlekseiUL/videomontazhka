@@ -1,0 +1,6 @@
+click==8.2.1
+numpy==2.2.6
+opencv-python-headless==4.12.0.88
+platformdirs==4.11.2
+scenedetect==0.6.7.1
+tqdm==4.70.0

@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "runtime_id": "sprut-creative-browser-v1",
+  "policy": {
+    "approval_gate_required": true,
+    "approved_visual_binding_required": true,
+    "local_bundles_only": true,
+    "network_allowed": false,
+    "paid_apis": [],
+    "remotion": false,
+    "review_requirement": "full_preview_user_approval"
+  },
+  "effects": [
+    {
+      "id": "pixi-semantic-accent",
+      "status": "audited",
+      "engine": "pixi.js@8.19.0 + pixi-filters@6.1.5",
+      "default_enabled": true,
+      "deterministic": true,
+      "semantic_use": "A short shockwave, particle, or glow accent on an approved key idea."
+    },
+    {
+      "id": "rough-screen-annotation",
+      "status": "audited",
+      "engine": "rough-notation@0.5.1",
+      "default_enabled": true,
+      "deterministic": true,
+      "semantic_use": "Point to one approved screen region or phrase without covering it."
+    },
+    {
+      "id": "lottie-local-icon",
+      "status": "audited",
+      "engine": "lottie-web@5.13.0",
+      "default_enabled": true,
+      "deterministic": true,
+      "semantic_use": "A user-owned local vector icon that reinforces one approved concept."
+    },
+    {
+      "id": "three-spatial-system",
+      "status": "audited_experimental",
+      "engine": "three@0.185.1",
+      "default_enabled": false,
+      "deterministic": true,
+      "semantic_use": "A short approved spatial system or relationship diagram."
+    }
+  ],
+  "deferred_effects": [
+    {
+      "id": "shader-transition",
+      "status": "blocked",
+      "reason_code": "no_audited_seek_safe_compositor_and_boundary_qa_binding",
+      "runtime_allowlist_authority": "RUNTIME_MANIFEST.json#/gl_transition_policy/allowlist",
+      "unlisted_shader_default": "blocked",
+      "requirements_to_enable": [
+        "copy one exact allowlisted shader and verify its manifest SHA-256",
+        "use an audited seek-safe local WebGL compositor",
+        "pass visual preview sheet and transition boundary QA",
+        "record full-preview user approval"
+      ]
+    }
+  ]
+}

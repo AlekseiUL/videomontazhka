@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-effect.css">
+    <style>
+      #kinetic_split_keyword .scene-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+      }
+      #kinetic_split_keyword .keyword-frame {
+        position: relative;
+        width: min(88%, 1560px);
+        padding: clamp(42px, 4vw, 78px) clamp(48px, 5vw, 96px);
+        border-radius: 34px;
+        overflow: hidden;
+      }
+      #kinetic_split_keyword .accent-rail {
+        position: absolute;
+        left: 0;
+        top: 10%;
+        width: 15px;
+        height: 80%;
+        border-radius: 0 10px 10px 0;
+        background: var(--sprut-accent);
+        transform-origin: center bottom;
+      }
+      #kinetic_split_keyword .keyword {
+        margin: 0;
+        max-width: 100%;
+        color: var(--sprut-primary);
+        font-size: clamp(68px, 7.3vw, 152px);
+        line-height: 0.96;
+        overflow-wrap: anywhere;
+        text-wrap: balance;
+        text-shadow: 0 14px 52px rgba(0, 0, 0, 0.66);
+      }
+      #kinetic_split_keyword .word,
+      #kinetic_split_keyword .char {
+        display: inline-block;
+        will-change: transform, opacity;
+      }
+      #kinetic_split_keyword .corner {
+        position: absolute;
+        right: 28px;
+        bottom: 26px;
+        width: 70px;
+        height: 18px;
+        border-right: 2px solid var(--sprut-secondary);
+        border-bottom: 2px solid var(--sprut-secondary);
+        opacity: 0.65;
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./vendor/SplitText.min.js"></script>
+    <script src="./creative-effect-runtime.js"></script>
+  </head>
+  <body>
+    <div id="kinetic_split_keyword" class="sprut-gsap-stage" data-composition-id="kinetic_split_keyword" data-start="0" data-duration="3" data-track-index="0" data-width="1920" data-height="1080">
+      <div class="scene-content">
+        <div id="keyword-frame" class="keyword-frame sprut-local-plate">
+          <div id="accent-rail" class="accent-rail"></div>
+          <p id="split-text" class="keyword sprut-display" data-sprut-approved-text></p>
+          <div id="keyword-corner" class="corner"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var state = window.SPRUTGSAPCreative.prepare("kinetic_split_keyword", "kinetic_split_keyword");
+      var SplitTextPlugin = window.SPRUTGSAPCreative.plugin("SplitText");
+      var split = new SplitTextPlugin("#split-text", {type: "words,chars", wordsClass: "word", charsClass: "char"});
+      var wordIndex = Math.min(state.config.content.accent_word_index, Math.max(0, split.words.length - 1));
+      if (split.words[wordIndex]) split.words[wordIndex].style.color = "#FF6A00";
+      var targets = state.config.options.split === "chars" ? split.chars : split.words;
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#keyword-frame", {x: -72, opacity: 0, duration: 0.64, ease: "expo.out"}, 0.16);
+      tl.from("#accent-rail", {scaleY: 0, duration: 0.44, ease: "power4.out"}, 0.22);
+      tl.from(targets, {yPercent: 115, rotation: 2.4, opacity: 0, duration: 0.56, stagger: {amount: 0.36, from: "start"}, ease: "back.out(1.35)"}, 0.25);
+      tl.from("#keyword-corner", {scale: 0.3, opacity: 0, duration: 0.35, ease: "circ.out"}, 0.58);
+      tl.to("#keyword-frame", {y: -22, opacity: 0, duration: 0.3, ease: "power3.in"}, window.SPRUTGSAPCreative.finalExitAt(state.duration, 0.3));
+      window.SPRUTGSAPCreative.register("kinetic_split_keyword", tl);
+    </script>
+  </body>
+</html>

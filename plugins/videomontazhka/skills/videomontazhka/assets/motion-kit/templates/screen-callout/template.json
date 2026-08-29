@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "screen-callout",
+  "audited": true,
+  "text_mode": "required",
+  "asset_types": ["diagram"],
+  "default_duration_s": 3.2,
+  "transparent": true,
+  "experimental": false,
+  "required_media": []
+}

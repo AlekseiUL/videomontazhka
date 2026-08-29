@@ -1,0 +1,8 @@
+interface:
+  display_name: "Видеомонтажка"
+  short_description: "Надёжный смысловой монтаж видео в Codex"
+  brand_color: "#FF6A00"
+  default_prompt: "Используй $videomontazhka, чтобы превратить исходные видео в согласованный готовый ролик."
+
+policy:
+  allow_implicit_invocation: true

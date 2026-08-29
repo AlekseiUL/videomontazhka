@@ -1,0 +1,20 @@
+{
+  "name": "videomontazhka",
+  "interface": {
+    "displayName": "Видеомонтажка"
+  },
+  "plugins": [
+    {
+      "name": "videomontazhka",
+      "source": {
+        "source": "local",
+        "path": "./plugins/videomontazhka"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Media"
+    }
+  ]
+}

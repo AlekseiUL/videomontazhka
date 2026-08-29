@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "name": "",
+  "source_mode": "auto",
+  "paid_api_allowlist": ["elevenlabs"],
+  "brand": {
+    "background": "#070707",
+    "accent": "#FF6A00",
+    "primary": "#FFFFFF",
+    "secondary": "#A8A8A8",
+    "panel": "#121212",
+    "font_regular": null,
+    "font_bold": null,
+    "logo": null
+  },
+  "presenter": {
+    "mode": "auto",
+    "preserve_source_geometry": true,
+    "circle_only_when_source_is_circle_or_isolated": true,
+    "layout_preview_required_when_ambiguous": true
+  },
+  "deliverables": [],
+  "evidence": {
+    "required_modality": true,
+    "speech_requires_transcript": true,
+    "visual_requires_description": true,
+    "boundary_tolerance_s": 0.25
+  },
+  "audio": {
+    "analysis_first": true,
+    "ab_preview_before_restoration": true,
+    "max_unapproved_boundary_silence_s": 0.35,
+    "max_unapproved_internal_silence_s": 0.75,
+    "target_lufs": -14.0,
+    "true_peak_dbtp": -2.0,
+    "aac_bitrate": "192k"
+  },
+  "transitions": {
+    "default": "hard_cut",
+    "renderer_allowed": ["hard_cut"],
+    "editorial_options_requiring_separate_tested_renderer": ["j_cut", "l_cut", "dissolve", "match_cut"],
+    "chapter_bridge_implementation": "full_frame_overlay_plus_hard_cut",
+    "decorative_effect_pack": false
+  },
+  "qa": {
+    "exact_boundary_frames": true,
+    "block_on_black_or_flash": true,
+    "block_on_audio_spike": true,
+    "manual_visual_review": true,
+    "vertical_safe_area": {"top": 150, "right": 150, "bottom": 420, "left": 80},
+    "horizontal_safe_area": {"top": 70, "right": 100, "bottom": 70, "left": 100}
+  }
+}

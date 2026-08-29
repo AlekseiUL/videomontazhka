@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "id": "morph_concept",
+  "audited": true,
+  "description": "Morph one deterministic SVG system shape to express an approved conceptual transformation.",
+  "asset_types": ["title", "diagram", "comparison", "process"],
+  "max_words": 28,
+  "transparent": true,
+  "plugin_files": ["MorphSVGPlugin.min.js"]
+}

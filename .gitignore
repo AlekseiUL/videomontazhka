@@ -1,0 +1,58 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node and local runtimes
+node_modules/
+.npm/
+.cache/
+runtime/
+.runtime/
+
+# macOS and editors
+.DS_Store
+._*
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Media and generated project artifacts
+edit/
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+*.m4v
+*.mp3
+*.wav
+*.m4a
+*.aac
+*.flac
+*.srt
+*.vtt
+*.ass
+*.part
+*.part.*
+
+# Test/build output
+build/
+dist/
+coverage.xml
+junit.xml

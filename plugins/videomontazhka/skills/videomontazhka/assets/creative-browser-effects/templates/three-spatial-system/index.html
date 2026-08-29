@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-browser-effect.css">
+    <style>
+      #three-spatial-system .three-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+      #three-spatial-system .experimental-badge {
+        position: absolute; right: var(--safe-right); top: var(--safe-top); z-index: 5;
+        padding: 10px 16px; border: 2px solid var(--sprut-accent); border-radius: 999px;
+        color: var(--sprut-primary); background: rgba(7,7,7,.78); font: 650 18px/1 "SPRUT Body", sans-serif;
+        letter-spacing: .08em; text-transform: uppercase;
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-creative-browser-runtime.js"></script>
+    <script src="./vendor/sprut-three.js"></script>
+  </head>
+  <body>
+    <div id="three-spatial-system" class="sprut-creative-stage" data-composition-id="three-spatial-system" data-start="0" data-duration="3.2" data-track-index="0" data-width="1920" data-height="1080">
+      <canvas id="three-canvas" class="three-canvas"></canvas>
+      <div id="three-badge" class="experimental-badge">experimental 3D</div>
+      <div id="three-label" class="sprut-approved-label" data-sprut-approved-text></div>
+    </div>
+    <script>
+      (function () {
+        "use strict";
+        var prepared = window.SPRUTCreative.prepare("three-spatial-system");
+        if (!window.SPRUT_THREE) throw new Error("SPRUT Three bundle did not load");
+        if (prepared.effect.enabled !== true || prepared.effect.experimental !== true) throw new Error("experimental Three effect is not explicitly enabled");
+        var api = window.SPRUT_THREE;
+        var composition = prepared.config.composition;
+        var canvas = document.getElementById("three-canvas");
+        var renderer = new api.WebGLRenderer({canvas: canvas, alpha: true, antialias: true, preserveDrawingBuffer: true});
+        renderer.setPixelRatio(1);
+        renderer.setSize(composition.width, composition.height, false);
+        renderer.setClearColor(0x070707, 0);
+        var scene = new api.Scene();
+        var camera = new api.PerspectiveCamera(42, composition.width / composition.height, 0.1, 100);
+        camera.position.set(0, 0, 9.5);
+        var group = new api.Group();
+        scene.add(group);
+        var random = window.SPRUTCreative.seeded(prepared.effect.seed);
+        var orange = new api.MeshBasicMaterial({color: 0xFF6A00});
+        var white = new api.MeshBasicMaterial({color: 0xFFFFFF});
+        var gray = new api.MeshBasicMaterial({color: 0xA8A8A8});
+        var center = new api.Mesh(new api.SphereGeometry(0.46, 32, 20), orange);
+        group.add(center);
+        for (var index = 0; index < prepared.effect.node_count; index += 1) {
+          var angle = (index / prepared.effect.node_count) * Math.PI * 2 + (random() - 0.5) * 0.18;
+          var radius = 2.0 + random() * 2.1;
+          var x = Math.cos(angle) * radius;
+          var y = Math.sin(angle) * radius * 0.62;
+          var z = (random() - 0.5) * 2.2;
+          var size = 0.18 + random() * 0.22;
+          var node = new api.Mesh(new api.SphereGeometry(size, 20, 12), index % 3 === 0 ? white : gray);
+          node.position.set(x, y, z);
+          group.add(node);
+          var length = Math.sqrt(x * x + y * y);
+          var link = new api.Mesh(new api.BoxGeometry(length, 0.026, 0.026), gray);
+          link.position.set(x / 2, y / 2, z / 2);
+          link.rotation.z = Math.atan2(y, x);
+          link.material = link.material.clone();
+          link.material.transparent = true;
+          link.material.opacity = 0.42;
+          group.add(link);
+        }
+        var state = {progress: 0};
+        function renderScene() {
+          group.rotation.y = -0.48 + state.progress * 1.05;
+          group.rotation.x = 0.16 + Math.sin(state.progress * Math.PI) * 0.12;
+          camera.position.z = 10.4 - state.progress * 1.5;
+          renderer.render(scene, camera);
+        }
+        renderScene();
+        var tl = window.gsap.timeline({paused: true});
+        tl.to(state, {progress: 1, duration: Math.max(0.6, prepared.duration - 0.26), ease: "power1.inOut", onUpdate: renderScene}, 0.14);
+        tl.fromTo("#three-canvas", {scale: 0.82, opacity: 0}, {scale: 1, opacity: 1, duration: 0.62, ease: "power3.out"}, 0.14);
+        tl.fromTo(["#three-label", "#three-badge"], {y: 26, opacity: 0}, {y: 0, opacity: 1, duration: 0.46, stagger: 0.05, ease: "power3.out"}, 0.2);
+        tl.to(["#three-canvas", "#three-label", "#three-badge"], {opacity: 0, duration: 0.3, ease: "power2.in"}, window.SPRUTCreative.finalExitAt(prepared.duration, 0.3));
+        window.SPRUTCreative.register("three-spatial-system", tl);
+        window.SPRUT_EFFECT_READY = Promise.resolve(true);
+      })();
+    </script>
+  </body>
+</html>

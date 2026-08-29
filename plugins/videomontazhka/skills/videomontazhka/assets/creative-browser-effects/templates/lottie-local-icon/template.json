@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "id": "lottie-local-icon",
+  "audited": true,
+  "engine": "lottie-web",
+  "text_mode": "optional",
+  "asset_types": ["title", "diagram", "process", "cta", "b_roll"],
+  "default_duration_s": 2.6,
+  "transparent": true,
+  "experimental": false,
+  "default_enabled": true,
+  "deterministic": true,
+  "required_local_asset": true,
+  "required_flags": ["--confirm-user-owned-lottie"],
+  "runtime_files": ["vendor/lottie-light.min.js"],
+  "license_files": ["licenses/lottie-web-MIT.txt"]
+}

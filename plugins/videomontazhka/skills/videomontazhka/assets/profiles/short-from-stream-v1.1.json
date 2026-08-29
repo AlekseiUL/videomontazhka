@@ -1,0 +1,31 @@
+{
+  "id": "short-from-stream-v1.1",
+  "supersedes": "short-from-stream-v1-circle-default",
+  "deliverable": {
+    "platforms": ["instagram_reels", "youtube_shorts"],
+    "aspect": "9:16",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "subtitles": "burned_optional"
+  },
+  "narrative_contract": ["hook", "problem_or_question", "mechanism_or_example", "solution", "payoff", "optional_cta"],
+  "presenter": {
+    "default": "preserve",
+    "rectangle_when": ["rectangular_with_context", "unknown"],
+    "circle_when": ["already_circular", "isolated_subject", "explicit_user_override"],
+    "never_force_circle": true
+  },
+  "screen": {
+    "complete_context_before_detail": true,
+    "important_area_share": [0.65, 0.85],
+    "preserve_original_white_diagram": true
+  },
+  "brand": {
+    "background": "#070707",
+    "accent": "#FF6A00",
+    "primary": "#FFFFFF",
+    "secondary": "#A8A8A8"
+  },
+  "vertical_safe_area": {"top": 150, "right": 150, "bottom": 420, "left": 80}
+}

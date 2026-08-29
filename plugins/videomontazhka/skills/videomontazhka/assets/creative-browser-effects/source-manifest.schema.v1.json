@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sprut:creative-browser-effect:source-manifest:v1",
+  "title": "SPRUT creative browser effect source manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "type", "generator", "visual", "effect", "runtime", "restrictions", "files", "review_requirement"],
+  "properties": {
+    "version": {"const": 1},
+    "type": {"const": "sprut_creative_browser_source_manifest"},
+    "generator": {"$ref": "#/$defs/snapshotWithVersion"},
+    "visual": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visual_id", "section_id", "meaning_ids", "purpose", "treatment", "asset_type", "approved_text", "semantic_plan", "approval"],
+      "properties": {
+        "visual_id": {"type": "string", "minLength": 1},
+        "section_id": {"type": "string", "minLength": 1},
+        "meaning_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "purpose": {"type": "string", "minLength": 1},
+        "treatment": {"type": "string", "minLength": 1},
+        "asset_type": {"type": "string", "minLength": 1},
+        "approved_text": {"type": ["string", "null"]},
+        "semantic_plan": {"$ref": "#/$defs/snapshot"},
+        "approval": {"$ref": "#/$defs/snapshot"}
+      }
+    },
+    "effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "experimental", "default_enabled", "deterministic", "source_sha256", "metadata_sha256", "config_sha256", "local_asset"],
+      "properties": {
+        "id": {"enum": ["pixi-semantic-accent", "rough-screen-annotation", "lottie-local-icon", "three-spatial-system"]},
+        "version": {"const": 1},
+        "experimental": {"type": "boolean"},
+        "default_enabled": {"type": "boolean"},
+        "deterministic": {"const": true},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "metadata_sha256": {"$ref": "#/$defs/sha256"},
+        "config_sha256": {"$ref": "#/$defs/sha256"},
+        "local_asset": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "source_path", "source_sha256", "copied_file", "rights_attestation"],
+              "properties": {
+                "kind": {"const": "lottie_json"},
+                "source_path": {"type": "string", "minLength": 1},
+                "source_sha256": {"$ref": "#/$defs/sha256"},
+                "copied_file": {"$ref": "#/$defs/localPath"},
+                "rights_attestation": {"const": "user_owned"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_id", "source_manifest", "packages", "copied_bundles", "copied_licenses", "gsap", "offline", "network_allowed", "paid_apis", "remotion"],
+      "properties": {
+        "runtime_id": {"const": "sprut-creative-browser-v1"},
+        "source_manifest": {"$ref": "#/$defs/snapshot"},
+        "packages": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"$ref": "#/$defs/package"}},
+        "copied_bundles": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"$ref": "#/$defs/fileRecord"}},
+        "copied_licenses": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"$ref": "#/$defs/fileRecord"}},
+        "gsap": {"$ref": "#/$defs/fileRecord"},
+        "offline": {"const": true},
+        "network_allowed": {"const": false},
+        "paid_apis": {"type": "array", "maxItems": 0},
+        "remotion": {"const": false}
+      }
+    },
+    "restrictions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["remote_media", "lottie_url_loading", "shader_transition", "three_default"],
+      "properties": {
+        "remote_media": {"const": "prohibited"},
+        "lottie_url_loading": {"const": "prohibited"},
+        "shader_transition": {"const": "blocked_no_audited_compositor"},
+        "three_default": {"const": "off_requires_explicit_flag"}
+      }
+    },
+    "files": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/fileRecord"}},
+    "review_requirement": {"const": "full_preview_user_approval"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "localPath": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*://)[^\\u0000\\r\\n]+$"},
+    "snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "snapshotWithVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "path", "sha256"],
+      "properties": {"version": {"type": "string", "minLength": 1}, "path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "fileRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "size_bytes"],
+      "properties": {
+        "path": {"$ref": "#/$defs/localPath"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "size_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "license"],
+      "properties": {
+        "name": {"enum": ["pixi.js", "pixi-filters", "rough-notation", "lottie-web", "three"]},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "license": {"const": "MIT"}
+      }
+    }
+  }
+}

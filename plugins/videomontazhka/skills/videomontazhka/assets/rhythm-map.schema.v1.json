@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sprut.ai/schemas/rhythm-map.schema.v1.json",
+  "title": "SPRUT local rhythm and onset map",
+  "type": "object",
+  "required": [
+    "version",
+    "type",
+    "tool_id",
+    "source",
+    "semantic_contract",
+    "analysis_window",
+    "tempo_bpm",
+    "statistics",
+    "beats",
+    "onsets",
+    "suggested_accents",
+    "limitations",
+    "runtime"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "type": {"const": "sprut_rhythm_map"},
+    "tool_id": {"const": "sprut.audio.rhythm_map.v1"},
+    "source": {
+      "type": "object",
+      "required": ["path", "sha256", "scope", "source_id"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "scope": {"enum": ["source_manifest", "edit_asset"]},
+        "source_id": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "semantic_contract": {
+      "type": "object",
+      "required": ["plan", "approval"],
+      "properties": {
+        "plan": {"$ref": "#/$defs/file_identity"},
+        "approval": {"$ref": "#/$defs/file_identity"}
+      },
+      "additionalProperties": false
+    },
+    "analysis_window": {
+      "type": "object",
+      "required": [
+        "start_s",
+        "end_s",
+        "duration_s",
+        "sample_rate_hz",
+        "hop_length_samples",
+        "decoded_channels"
+      ],
+      "properties": {
+        "start_s": {"type": "number", "minimum": 0.0},
+        "end_s": {"type": "number", "exclusiveMinimum": 0.0},
+        "duration_s": {"type": "number", "exclusiveMinimum": 0.0},
+        "sample_rate_hz": {"enum": [11025, 22050, 44100]},
+        "hop_length_samples": {"type": "integer", "minimum": 128, "maximum": 2048},
+        "decoded_channels": {"const": 1}
+      },
+      "additionalProperties": false
+    },
+    "tempo_bpm": {"type": ["number", "null"], "minimum": 0.0},
+    "statistics": {
+      "type": "object",
+      "required": [
+        "beat_count",
+        "onset_count",
+        "suggested_accent_count",
+        "beat_interval_median_s",
+        "beat_interval_mad_s",
+        "onset_strength_reference"
+      ],
+      "properties": {
+        "beat_count": {"type": "integer", "minimum": 0},
+        "onset_count": {"type": "integer", "minimum": 0},
+        "suggested_accent_count": {"type": "integer", "minimum": 0},
+        "beat_interval_median_s": {"type": ["number", "null"], "minimum": 0.0},
+        "beat_interval_mad_s": {"type": ["number", "null"], "minimum": 0.0},
+        "onset_strength_reference": {"type": "number", "minimum": 0.0}
+      },
+      "additionalProperties": false
+    },
+    "beats": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/timed_event"}
+    },
+    "onsets": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/timed_event"}
+    },
+    "suggested_accents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "index",
+          "time_s",
+          "relative_time_s",
+          "strength",
+          "aligned_to_beat",
+          "nearest_beat_time_s",
+          "beat_distance_s",
+          "status"
+        ],
+        "properties": {
+          "index": {"type": "integer", "minimum": 0},
+          "time_s": {"type": "number", "minimum": 0.0},
+          "relative_time_s": {"type": "number", "minimum": 0.0},
+          "strength": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+          "aligned_to_beat": {"type": "boolean"},
+          "nearest_beat_time_s": {"type": ["number", "null"], "minimum": 0.0},
+          "beat_distance_s": {"type": ["number", "null"], "minimum": 0.0},
+          "status": {"const": "candidate_only_requires_semantic_router"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["generator", "schema", "librosa", "numpy", "ffmpeg"],
+      "properties": {
+        "generator": {"$ref": "#/$defs/file_identity"},
+        "schema": {"$ref": "#/$defs/file_identity"},
+        "librosa": {"type": "string", "minLength": 1},
+        "numpy": {"type": "string", "minLength": 1},
+        "ffmpeg": {
+          "type": "object",
+          "required": ["path", "version"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "timed_event": {
+      "type": "object",
+      "required": ["index", "time_s", "relative_time_s", "strength"],
+      "properties": {
+        "index": {"type": "integer", "minimum": 0},
+        "time_s": {"type": "number", "minimum": 0.0},
+        "relative_time_s": {"type": "number", "minimum": 0.0},
+        "strength": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+      },
+      "additionalProperties": false
+    },
+    "file_identity": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

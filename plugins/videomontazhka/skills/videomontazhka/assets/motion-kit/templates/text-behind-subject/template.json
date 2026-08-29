@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "id": "text-behind-subject",
+  "audited": true,
+  "text_mode": "required",
+  "asset_types": ["title", "quote"],
+  "default_duration_s": 3.2,
+  "transparent": false,
+  "experimental": true,
+  "required_media": ["background", "foreground"]
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./motion-kit.css">
+    <style>
+      #chapter-bridge-premium .chapter-grid {
+        position: absolute;
+        inset: 0;
+        opacity: 0.12;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.12) 1px, rgba(255, 255, 255, 0) 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, rgba(255, 255, 255, 0) 1px);
+        background-size: 96px 96px;
+      }
+      #chapter-bridge-premium .chapter-safe { align-items: center; }
+      #chapter-bridge-premium .chapter-copy {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 1500px;
+      }
+      #chapter-bridge-premium .chapter-rail {
+        width: 18px;
+        min-height: 240px;
+        margin-right: 48px;
+        border-radius: 10px;
+        background: var(--sprut-accent);
+        transform-origin: center bottom;
+      }
+      #chapter-bridge-premium .chapter-title {
+        max-width: 1260px;
+        color: var(--sprut-primary);
+        font-size: clamp(76px, 8.3vw, 166px);
+        line-height: 0.98;
+        overflow-wrap: anywhere;
+      }
+      #chapter-bridge-premium .chapter-tag {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        color: var(--sprut-secondary);
+        font-size: clamp(18px, 1.4vw, 28px);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-motion-runtime.js"></script>
+  </head>
+  <body>
+    <div id="chapter-bridge-premium" class="sprut-stage" data-sprut-full-frame="true" data-composition-id="chapter-bridge-premium" data-start="0" data-duration="3.6" data-track-index="0" data-width="1920" data-height="1080">
+      <div id="chapter-grid" class="chapter-grid" data-layout-ignore></div>
+      <div class="sprut-safe chapter-safe">
+        <div class="chapter-copy">
+          <div id="chapter-rail" class="chapter-rail"></div>
+          <div id="chapter-title" class="chapter-title sprut-display" data-sprut-approved-text></div>
+          <div id="chapter-tag" class="chapter-tag sprut-mono">SPRUT · НОВАЯ ТЕМА</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var state = window.SPRUTMotion.prepare("chapter-bridge-premium");
+      var tl = window.gsap.timeline({paused: true});
+      tl.from("#chapter-grid", {opacity: 0, duration: 0.6, ease: "sine.out"}, 0.16);
+      tl.from("#chapter-rail", {scaleY: 0, opacity: 0, duration: 0.5, ease: "power3.out"}, 0.2);
+      tl.from("#chapter-title", {x: -72, opacity: 0, duration: 0.7, ease: "expo.out"}, 0.28);
+      tl.from("#chapter-tag", {y: 24, opacity: 0, duration: 0.42, ease: "power2.out"}, 0.54);
+      tl.to("#chapter-title", {x: 42, opacity: 0, duration: 0.38, ease: "power2.in"}, window.SPRUTMotion.finalExitAt(state.duration, 0.38));
+      tl.to("#chapter-grid", {opacity: 0, duration: 0.36, ease: "sine.in"}, window.SPRUTMotion.finalExitAt(state.duration, 0.36));
+      window.SPRUTMotion.register("chapter-bridge-premium", tl);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["chapter-bridge-premium"] = tl;
+    </script>
+  </body>
+</html>

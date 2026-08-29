@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./creative-browser-effect.css">
+    <style>
+      #pixi-semantic-accent .pixi-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+      #pixi-semantic-accent .semantic-core {
+        position: absolute; left: 50%; top: 50%; width: 26px; height: 26px;
+        margin: -13px 0 0 -13px; border: 5px solid var(--sprut-primary);
+        border-radius: 50%; box-shadow: 0 0 0 10px rgba(255,106,0,.22), 0 0 44px rgba(255,106,0,.84);
+      }
+    </style>
+    <script src="./config.js"></script>
+    <script src="./vendor/gsap.min.js"></script>
+    <script src="./sprut-creative-browser-runtime.js"></script>
+    <script src="./vendor/sprut-pixi.js"></script>
+  </head>
+  <body>
+    <div id="pixi-semantic-accent" class="sprut-creative-stage" data-composition-id="pixi-semantic-accent" data-start="0" data-duration="2.8" data-track-index="0" data-width="1920" data-height="1080">
+      <canvas id="pixi-canvas" class="pixi-canvas"></canvas>
+      <div id="pixi-core" class="semantic-core"></div>
+      <div id="pixi-label" class="sprut-approved-label" data-sprut-approved-text></div>
+    </div>
+    <script>
+      (function () {
+        "use strict";
+        var prepared = window.SPRUTCreative.prepare("pixi-semantic-accent");
+        if (!window.SPRUT_PIXI) throw new Error("SPRUT Pixi bundle did not load");
+        var api = window.SPRUT_PIXI;
+        var effect = prepared.effect;
+        var composition = prepared.config.composition;
+        var centerX = effect.center.x * composition.width;
+        var centerY = effect.center.y * composition.height;
+        var canvas = document.getElementById("pixi-canvas");
+        var app = new api.Application();
+        var state = {progress: 0};
+        var ready = false;
+        var particles = [];
+        var ring = null;
+        var shock = null;
+        var bloom = null;
+
+        function renderEffect() {
+          if (!ready) return;
+          var progress = state.progress;
+          var burst = Math.sin(Math.min(1, progress * 1.35) * Math.PI);
+          if (ring) {
+            ring.scale.set(0.35 + progress * 4.8);
+            ring.alpha = Math.max(0, 1 - progress) * 0.86;
+          }
+          for (var index = 0; index < particles.length; index += 1) {
+            var particle = particles[index];
+            var distance = particle.speed * progress * (0.82 + 0.18 * burst);
+            particle.node.position.set(centerX + Math.cos(particle.angle) * distance, centerY + Math.sin(particle.angle) * distance);
+            particle.node.scale.set(0.74 + burst * 0.72);
+            particle.node.alpha = Math.max(0, 1 - Math.pow(progress, 1.65));
+          }
+          if (shock) shock.time = progress * 2.15;
+          if (bloom) bloom.bloomScale = 0.65 + burst * 1.25;
+          app.renderer.render(app.stage);
+        }
+
+        var tl = window.gsap.timeline({paused: true});
+        tl.to(state, {progress: 1, duration: Math.max(0.5, prepared.duration - 0.24), ease: "power2.out", onUpdate: renderEffect}, 0.14);
+        tl.fromTo("#pixi-core", {scale: 0.25, opacity: 0}, {scale: 1, opacity: 1, duration: 0.38, ease: "back.out(2.2)"}, 0.14);
+        tl.fromTo("#pixi-label", {x: -54, opacity: 0}, {x: 0, opacity: 1, duration: 0.48, ease: "power3.out"}, 0.2);
+        tl.to("#pixi-label", {y: -12, opacity: 0, duration: 0.28, ease: "power2.in"}, window.SPRUTCreative.finalExitAt(prepared.duration, 0.28));
+        tl.to("#pixi-core", {scale: 1.6, opacity: 0, duration: 0.24, ease: "power2.in"}, window.SPRUTCreative.finalExitAt(prepared.duration, 0.24));
+        window.SPRUTCreative.register("pixi-semantic-accent", tl);
+
+        window.SPRUT_EFFECT_READY = app.init({
+          canvas: canvas,
+          width: composition.width,
+          height: composition.height,
+          resolution: 1,
+          antialias: true,
+          autoStart: false,
+          backgroundAlpha: 0,
+          preference: "webgl"
+        }).then(function () {
+          var random = window.SPRUTCreative.seeded(effect.seed);
+          ring = new api.Graphics().circle(0, 0, 44).stroke({width: 8, color: 0xFF6A00, alpha: 0.94});
+          ring.position.set(centerX, centerY);
+          app.stage.addChild(ring);
+          if (effect.mode === "particles" || effect.mode === "combined") {
+            for (var index = 0; index < effect.particle_count; index += 1) {
+              var angle = random() * Math.PI * 2;
+              var radius = 3 + random() * 8;
+              var node = new api.Graphics().circle(0, 0, radius).fill(index % 4 === 0 ? 0xFFFFFF : 0xFF6A00);
+              node.position.set(centerX, centerY);
+              app.stage.addChild(node);
+              particles.push({node: node, angle: angle, speed: 170 + random() * 620});
+            }
+          }
+          if (effect.mode === "shockwave" || effect.mode === "combined") {
+            shock = new api.ShockwaveFilter({center: {x: centerX, y: centerY}, speed: 520, amplitude: 18, wavelength: 150, brightness: 1, radius: 1200});
+            app.stage.filters = (app.stage.filters || []).concat([shock]);
+          }
+          if (effect.mode === "glow" || effect.mode === "combined") {
+            bloom = new api.AdvancedBloomFilter({threshold: 0.18, bloomScale: 1.2, brightness: 1, blur: 5, quality: 4});
+            app.stage.filters = (app.stage.filters || []).concat([bloom]);
+          }
+          ready = true;
+          renderEffect();
+          return true;
+        });
+      })();
+    </script>
+  </body>
+</html>
