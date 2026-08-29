@@ -24,6 +24,7 @@ from typing import Any
 import numpy as np
 
 from asset_gate import AssetGateError, canonical_edit_dir, path_under_edit, require_asset_gate
+from creative_approval import require_creative_approval
 from schema_check import SchemaDefinitionError, Validator
 
 
@@ -437,6 +438,7 @@ def render(edit_dir_value: Path, spec_value: Path, output_value: Path, force: bo
     if not spec_path.is_file():
         raise ValueError(f"creative SFX spec not found: {spec_path}")
     require_asset_gate(edit_dir)
+    require_creative_approval(edit_dir)
     plan = edit_dir / "semantic_plan.json"
     approval = edit_dir / "approval.json"
     control_hashes = {
@@ -466,6 +468,7 @@ def render(edit_dir_value: Path, spec_value: Path, output_value: Path, force: bo
 
     stereo, audio = synthesize(spec)
     require_asset_gate(edit_dir)
+    require_creative_approval(edit_dir)
     current_hashes = {
         "plan": sha256_file(plan),
         "approval": sha256_file(approval),

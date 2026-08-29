@@ -255,6 +255,7 @@
         "height",
         "fps",
         "target_duration_s",
+        "minimum_duration_s",
         "subtitle_mode",
         "section_ids",
         "hook_id",
@@ -268,6 +269,7 @@
         "height": {"type": "integer", "minimum": 320, "multipleOf": 2},
         "fps": {"$ref": "#/$defs/fps"},
         "target_duration_s": {"type": "number", "exclusiveMinimum": 0},
+        "minimum_duration_s": {"type": "number", "exclusiveMinimum": 0},
         "subtitle_mode": {"enum": ["none", "burned", "sidecar"]},
         "section_ids": {
           "type": "array",

@@ -7,6 +7,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+try:
+    from tests.creative_approval_fixture import write_creative_approval
+except ModuleNotFoundError:  # CI discovers this file as a top-level module.
+    from creative_approval_fixture import write_creative_approval
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -66,6 +71,7 @@ class VirtualCameraProvenanceTest(unittest.TestCase):
                 "user_quote": "I approve the exact camera treatment.",
             },
         )
+        write_creative_approval(self.edit_dir)
 
         self.source = self.edit_dir / "work" / "source-backed.mov"
         self.source.parent.mkdir()

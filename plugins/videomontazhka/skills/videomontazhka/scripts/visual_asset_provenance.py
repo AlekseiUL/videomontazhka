@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from asset_gate import canonical_edit_dir, path_under_edit
+from creative_approval import require_creative_approval
 
 
 PROVENANCE_VERSION = 1
@@ -177,9 +178,13 @@ def _require_meaning_ids(value: Any) -> tuple[str, ...]:
 def load_approved_visual_plan_item(
     edit_dir: Path,
     visual_id: str,
+    *,
+    require_gate3: bool = True,
 ) -> ApprovedVisualPlanItem:
     """Load exactly one current approval-bound visual-plan item."""
     canonical = canonical_edit_dir(edit_dir)
+    if require_gate3:
+        require_creative_approval(canonical)
     requested_id = _require_string(visual_id, "visual_id")
     plan_path = canonical / "semantic_plan.json"
     approval_path = canonical / "approval.json"

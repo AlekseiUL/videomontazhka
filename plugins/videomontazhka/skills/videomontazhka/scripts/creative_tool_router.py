@@ -1475,7 +1475,11 @@ def run_route(args: argparse.Namespace) -> int:
     validate_request_semantics(normalized, tool_map)
 
     require_asset_gate(edit_dir)
-    approved_item = load_approved_visual_plan_item(edit_dir, normalized["binding"]["visual_id"])
+    approved_item = load_approved_visual_plan_item(
+        edit_dir,
+        normalized["binding"]["visual_id"],
+        require_gate3=False,
+    )
     approved = approval_context(approved_item)
     validate_binding(normalized, approved)
 

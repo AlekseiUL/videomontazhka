@@ -8,6 +8,11 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+try:
+    from tests.creative_approval_fixture import write_creative_approval
+except ModuleNotFoundError:  # CI discovers this file as a top-level module.
+    from creative_approval_fixture import write_creative_approval
 from typing import Any
 
 
@@ -213,6 +218,7 @@ class EndToEndReleaseTest(unittest.TestCase):
                         "height": 360,
                         "fps": 30,
                         "target_duration_s": 1.7,
+                        "minimum_duration_s": 1.0,
                         "subtitle_mode": "sidecar",
                         "section_ids": ["section_smoke"],
                         "hook_id": "hook_smoke",
@@ -229,6 +235,7 @@ class EndToEndReleaseTest(unittest.TestCase):
                 "--quote",
                 "I approve this exact smoke-test plan.",
             )
+            write_creative_approval(edit)
             card_spec = edit / "animations" / "smoke-card.json"
             write_json(
                 card_spec,

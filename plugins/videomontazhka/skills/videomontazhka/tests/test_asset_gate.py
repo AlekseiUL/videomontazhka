@@ -12,6 +12,11 @@ import unittest
 import wave
 from pathlib import Path
 
+try:
+    from tests.creative_approval_fixture import write_creative_approval
+except ModuleNotFoundError:  # CI discovers this file as a top-level module.
+    from creative_approval_fixture import write_creative_approval
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -152,6 +157,7 @@ class AssetGateTest(unittest.TestCase):
                         "height": 360,
                         "fps": 30,
                         "target_duration_s": 1.0,
+                        "minimum_duration_s": 0.5,
                         "subtitle_mode": "none",
                         "section_ids": ["section-1"],
                         "hook_id": "hook-1",
@@ -175,6 +181,7 @@ class AssetGateTest(unittest.TestCase):
                 "user_quote": "I approve this exact plan.",
             },
         )
+        write_creative_approval(self.edit_dir)
 
     def tearDown(self) -> None:
         self.temporary.cleanup()

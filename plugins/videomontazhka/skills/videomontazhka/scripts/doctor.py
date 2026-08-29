@@ -92,6 +92,54 @@ def command_output(command: list[str]) -> tuple[bool, str]:
     return result.returncode == 0, text
 
 
+def python_runtime_status(python: Path) -> dict[str, Any]:
+    """Prove interpreter identity and compatibility instead of trusting a path."""
+
+    command = [
+        str(python),
+        "-I",
+        "-c",
+        (
+            "import json,sys; "
+            "print(json.dumps({'probe':'videomontazhka-python-v1',"
+            "'version_info':list(sys.version_info[:3]),'version':sys.version}))"
+        ),
+    ]
+    status: dict[str, Any] = {"ok": False, "path": str(python)}
+    try:
+        completed = subprocess.run(
+            command, text=True, capture_output=True, check=False, timeout=10
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        status["error"] = f"not a compatible Python: probe failed: {exc}"
+        return status
+    if completed.returncode != 0:
+        status["error"] = f"not a compatible Python: probe exited {completed.returncode}"
+        return status
+    try:
+        payload = json.loads(completed.stdout)
+        version_info = payload["version_info"]
+    except (json.JSONDecodeError, KeyError, TypeError):
+        status["error"] = "not a compatible Python: identity probe returned invalid JSON"
+        return status
+    if (
+        not isinstance(payload, dict)
+        or payload.get("probe") != "videomontazhka-python-v1"
+        or not isinstance(version_info, list)
+        or len(version_info) != 3
+        or not all(isinstance(value, int) for value in version_info)
+        or tuple(version_info[:2]) < (3, 11)
+    ):
+        status["error"] = "not a compatible Python: version 3.11 or newer is required"
+        return status
+    status.update(
+        ok=True,
+        version_info=version_info,
+        version=str(payload.get("version", "")),
+    )
+    return status
+
+
 def first_line(command: list[str]) -> str | None:
     ok, output = command_output(command)
     if not ok or not output:
@@ -187,13 +235,12 @@ def main() -> int:
     runtime_python = configured_python()
     managed_python = runtime_python.is_relative_to(PYTHON_RUNTIME)
     runtime_installer = SCRIPT_DIR / "install_runtime.py"
-    required["python_runtime"] = {
-        "ok": runtime_python.is_file(),
-        "path": str(runtime_python),
-        "managed": managed_python,
-        "note": "isolated product runtime" if managed_python else "current interpreter fallback",
-        "recommended_install_command": [sys.executable, str(runtime_installer), "--install"],
-    }
+    required["python_runtime"] = python_runtime_status(runtime_python)
+    required["python_runtime"].update(
+        managed=managed_python,
+        note="isolated product runtime" if managed_python else "current interpreter fallback",
+        recommended_install_command=[sys.executable, str(runtime_installer), "--install"],
+    )
     if not managed_python:
         warnings.append(
             "using the current Python interpreter; run scripts/install_runtime.py --install "
@@ -203,7 +250,9 @@ def main() -> int:
     module_status: dict[str, bool] = {}
     module_python = str(runtime_python)
     for module in ("PIL", "numpy", "requests"):
-        ok, _ = command_output([module_python, "-c", f"import {module}"])
+        ok = False
+        if required["python_runtime"]["ok"]:
+            ok, _ = command_output([module_python, "-I", "-c", f"import {module}"])
         module_status[module] = ok
     required["python_modules"] = {"ok": all(module_status.values()), "modules": module_status}
 

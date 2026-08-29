@@ -3,6 +3,14 @@
   "interface": {
     "displayName": "Видеомонтажка"
   },
+  "author": {
+    "name": "Aleksei Ulyanov",
+    "url": "https://github.com/AlekseiUL"
+  },
+  "community": {
+    "name": "SPRUT_AI",
+    "url": "https://t.me/Sprut_AI"
+  },
   "plugins": [
     {
       "name": "videomontazhka",

@@ -136,6 +136,45 @@ def finite_non_negative_time(value: Any) -> float | None:
     return number if math.isfinite(number) and number >= 0 else None
 
 
+def validate_duration_contract(
+    deliverable: dict[str, Any],
+    retained_duration_s: float,
+    errors: list[str],
+) -> None:
+    """Enforce a hard floor separately from the approved target ±15% band."""
+
+    deliverable_id = deliverable.get("id")
+    try:
+        target = float(deliverable["target_duration_s"])
+        minimum = float(deliverable["minimum_duration_s"])
+    except (KeyError, TypeError, ValueError):
+        errors.append(
+            f"deliverable {deliverable_id!r} requires numeric target_duration_s and strict "
+            "minimum_duration_s"
+        )
+        return
+    if not math.isfinite(target) or target <= 0 or not math.isfinite(minimum) or minimum <= 0:
+        errors.append(
+            f"deliverable {deliverable_id!r} duration target and strict minimum must be positive"
+        )
+        return
+    if minimum > target:
+        errors.append(
+            f"deliverable {deliverable_id!r} strict minimum {minimum:.3f}s exceeds target "
+            f"{target:.3f}s"
+        )
+    if retained_duration_s > 0 and retained_duration_s < minimum:
+        errors.append(
+            f"EDL retained duration {retained_duration_s:.3f}s is below deliverable "
+            f"{deliverable_id!r} strict minimum {minimum:.3f}s"
+        )
+    if retained_duration_s > 0 and abs(retained_duration_s - target) > target * 0.15:
+        errors.append(
+            f"EDL retained duration {retained_duration_s:.3f}s is outside deliverable "
+            f"{deliverable_id!r} approved target {target:.3f}s ±15%"
+        )
+
+
 def build_evidence_map(plan: dict[str, Any]) -> dict[str, tuple[str, dict[str, Any]]]:
     evidence_map: dict[str, tuple[str, dict[str, Any]]] = {}
     for meaning in plan.get("source_truth") or []:
@@ -1989,18 +2028,7 @@ def validate_edl(
             )
 
     if selected_deliverable is not None:
-        try:
-            target_duration_s = float(selected_deliverable["target_duration_s"])
-        except (KeyError, TypeError, ValueError):
-            target_duration_s = 0.0
-        if math.isfinite(target_duration_s) and target_duration_s > 0 and retained_duration_s > 0:
-            tolerance_s = max(2.0, target_duration_s * 0.05)
-            if abs(retained_duration_s - target_duration_s) > tolerance_s:
-                errors.append(
-                    f"EDL retained duration {retained_duration_s:.3f}s differs materially from approved "
-                    f"deliverable {deliverable_id!r} target {target_duration_s:.3f}s "
-                    f"(allowed tolerance {tolerance_s:.3f}s)"
-                )
+        validate_duration_contract(selected_deliverable, retained_duration_s, errors)
 
     presenter = (project.get("presenter") or {}).get("mode", "auto")
     layouts = edl.get("layout_plan") or []

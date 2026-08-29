@@ -1,10 +1,14 @@
 {
   "name": "videomontazhka",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Approval-gated, transcript-led local video editing for Codex.",
   "author": {
-    "name": "SPRUT_AI",
+    "name": "Aleksei Ulyanov",
     "url": "https://github.com/AlekseiUL"
+  },
+  "community": {
+    "name": "SPRUT_AI",
+    "url": "https://t.me/Sprut_AI"
   },
   "homepage": "https://github.com/AlekseiUL/videomontazhka",
   "repository": "https://github.com/AlekseiUL/videomontazhka",

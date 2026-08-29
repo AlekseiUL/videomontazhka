@@ -8,6 +8,11 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+try:
+    from tests.creative_approval_fixture import write_creative_approval
+except ModuleNotFoundError:  # CI discovers this file as a top-level module.
+    from creative_approval_fixture import write_creative_approval
 from typing import Any
 
 
@@ -245,6 +250,7 @@ class EvidenceFixture:
                 "height": 360,
                 "fps": 30,
                 "target_duration_s": total_duration,
+                "minimum_duration_s": total_duration * 0.5,
                 "subtitle_mode": "none",
                 "section_ids": ["main"],
                 "hook_id": "hook_primary",
@@ -276,6 +282,7 @@ class EvidenceFixture:
             "approved_scope": ["semantic_structure", "editing_strategy", "visual_strategy"],
             "user_quote": "I approve this semantic plan.",
         })
+        write_creative_approval(self.edit)
         self.edl["approval_plan_sha256"] = plan_digest
         visual_by_id = {
             item["id"]: item

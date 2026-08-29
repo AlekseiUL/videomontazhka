@@ -9,6 +9,7 @@ into a new isolated environment. Existing targets are never overwritten.
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -18,6 +19,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +41,54 @@ MINIMUM_PYTHON = (3, 11)
 
 class RuntimeInstallError(RuntimeError):
     pass
+
+
+def normalize(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).casefold()
+
+
+@contextmanager
+def install_lock(
+    target: Path,
+    *,
+    timeout_s: float = 30.0,
+    poll_s: float = 0.1,
+):
+    """Serialize installers for one target with bounded contention."""
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = target.parent / f".{target.name}.install.lock"
+    deadline = time.monotonic() + timeout_s
+    descriptor: int | None = None
+    while descriptor is None:
+        try:
+            descriptor = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError:
+            if time.monotonic() >= deadline:
+                raise RuntimeInstallError(
+                    f"runtime installation already in progress for {target}; lock: {lock_path}"
+                )
+            time.sleep(poll_s)
+    try:
+        os.write(descriptor, f"pid={os.getpid()}\n".encode("ascii"))
+        os.fsync(descriptor)
+        yield
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
+        lock_path.unlink(missing_ok=True)
+
+
+def package_inventory(
+    installed: dict[str, str], *, direct_names: list[str]
+) -> list[dict[str, object]]:
+    """Return all installed distributions and mark direct requirements."""
+
+    direct = {normalize(name) for name in direct_names}
+    return [
+        {"name": name, "version": version, "direct": normalize(name) in direct}
+        for name, version in sorted(installed.items(), key=lambda item: normalize(item[0]))
+    ]
 
 
 def ensure_supported_python(version_info: tuple[int, ...] | None = None) -> None:
@@ -146,9 +196,8 @@ def inspect(runtime: Path) -> dict[str, Any]:
     names = requirement_names()
     probe_source = (
         "import importlib.metadata as m,json,platform,sys;"
-        f"names={names!r};"
         "print(json.dumps({'base_prefix':sys.base_prefix,'machine':platform.machine(),"
-        "'packages':{name:m.version(name) for name in names},"
+        "'packages':{(d.metadata.get('Name') or 'unknown'):d.version for d in m.distributions()},"
         "'prefix':sys.prefix,'python_version':platform.python_version()},sort_keys=True))"
     )
     probe = run([str(python), "-c", probe_source])
@@ -165,13 +214,20 @@ def inspect(runtime: Path) -> dict[str, Any]:
         # verification result deterministic and avoids leaking local details.
         pass
     packages = payload.get("packages")
-    if not isinstance(packages, dict) or set(packages) != set(names):
-        raise RuntimeInstallError("installed package inventory differs from requirements")
+    if not isinstance(packages, dict) or not all(
+        isinstance(name, str) and isinstance(version, str)
+        for name, version in packages.items()
+    ):
+        raise RuntimeInstallError("installed package inventory is invalid")
+    normalized_packages = {normalize(name): version for name, version in packages.items()}
+    missing = [name for name in names if normalize(name) not in normalized_packages]
+    if missing:
+        raise RuntimeInstallError(f"required packages are missing from runtime inventory: {missing}")
     constraints = requirement_constraints()
     violations = {
-        name: str(packages[name])
+        name: str(normalized_packages[normalize(name)])
         for name in names
-        if not _satisfies(str(packages[name]), constraints[name])
+        if not _satisfies(str(normalized_packages[normalize(name)]), constraints[name])
     }
     if violations:
         raise RuntimeInstallError(f"installed package versions violate requirements: {violations}")
@@ -187,10 +243,7 @@ def inspect(runtime: Path) -> dict[str, Any]:
             "path": "requirements.txt",
             "sha256": sha256(REQUIREMENTS),
         },
-        "packages": [
-            {"name": name, "version": str(packages[name])}
-            for name in sorted(names, key=str.lower)
-        ],
+        "packages": package_inventory(packages, direct_names=names),
         "imports": list(REQUIRED_IMPORTS),
         "policy": {
             "isolated_product_runtime": True,
@@ -239,44 +292,50 @@ def _safe_new_target(runtime: Path) -> Path:
 
 
 def install(runtime: Path, *, prefer_uv: bool = True) -> dict[str, Any]:
-    target = _safe_new_target(runtime)
+    target = runtime.expanduser().resolve(strict=False)
     target.parent.mkdir(parents=True, exist_ok=True)
-    created = True
-    try:
-        uv = shutil.which("uv") if prefer_uv else None
-        if uv:
-            run([uv, "venv", "--python", sys.executable, str(target)])
-            run(
-                [
-                    uv,
-                    "pip",
-                    "install",
-                    "--python",
-                    str(runtime_python(target)),
-                    "--requirement",
-                    str(REQUIREMENTS),
-                ]
-            )
-        else:
-            run([sys.executable, "-m", "venv", str(target)])
-            run(
-                [
-                    str(runtime_python(target)),
-                    "-m",
-                    "pip",
-                    "install",
-                    "--requirement",
-                    str(REQUIREMENTS),
-                ]
-            )
-        observed = inspect(target)
-        atomic_json(target / "RUNTIME_MANIFEST.json", observed)
-        verify_manifest(target, observed)
-        return observed
-    except Exception:
-        if created and target.is_dir():
-            shutil.rmtree(target, ignore_errors=True)
-        raise
+    with install_lock(target):
+        _safe_new_target(target)
+        staging = Path(
+            tempfile.mkdtemp(prefix=f".{target.name}.install-", dir=str(target.parent))
+        )
+        try:
+            uv = shutil.which("uv") if prefer_uv else None
+            if uv:
+                run([uv, "venv", "--python", sys.executable, str(staging)])
+                run(
+                    [
+                        uv,
+                        "pip",
+                        "install",
+                        "--python",
+                        str(runtime_python(staging)),
+                        "--requirement",
+                        str(REQUIREMENTS),
+                    ]
+                )
+            else:
+                run([sys.executable, "-m", "venv", str(staging)])
+                run(
+                    [
+                        str(runtime_python(staging)),
+                        "-m",
+                        "pip",
+                        "install",
+                        "--requirement",
+                        str(REQUIREMENTS),
+                    ]
+                )
+            observed = inspect(staging)
+            observed["runtime"] = str(target)
+            observed["python"] = str(Path(os.path.abspath(runtime_python(target))))
+            atomic_json(staging / "RUNTIME_MANIFEST.json", observed)
+            os.replace(staging, target)
+            verify_manifest(target, inspect(target))
+            return observed
+        except Exception:
+            shutil.rmtree(staging, ignore_errors=True)
+            raise
 
 
 def main() -> int:

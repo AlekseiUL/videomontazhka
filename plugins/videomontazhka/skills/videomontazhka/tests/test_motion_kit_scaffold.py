@@ -8,6 +8,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+try:
+    from tests.creative_approval_fixture import write_creative_approval
+except ModuleNotFoundError:  # CI discovers this file as a top-level module.
+    from creative_approval_fixture import write_creative_approval
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -156,6 +161,7 @@ class MotionKitScaffoldTest(unittest.TestCase):
                     "height": 1080,
                     "fps": 30,
                     "target_duration_s": 2.4,
+                    "minimum_duration_s": 1.2,
                     "subtitle_mode": "none",
                     "section_ids": ["section-1"],
                     "hook_id": "hook-1",
@@ -203,6 +209,7 @@ class MotionKitScaffoldTest(unittest.TestCase):
                 "user_quote": "I approve this exact motion visual plan.",
             },
         )
+        write_creative_approval(self.edit_dir)
 
     def _run(
         self, template: str = "kinetic-keyword", *, accept_terms: bool = True

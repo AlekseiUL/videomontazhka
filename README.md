@@ -4,7 +4,7 @@ English · [Русский](README.ru.md)
 
 **Videomontazhka** is an installable Codex plugin for transcript-led local video editing. It inventories source media, prepares a hash-bound transcription workflow, proposes an evidence-backed story structure, builds an edit decision list, renders approved graphics and audio, checks the result, and prepares a release pack.
 
-Status: **public beta 0.1**. The currently supported target is Codex on macOS with Apple Silicon. The source is public under Apache License 2.0; beta limitations and third-party terms remain documented below.
+Status: **public beta 0.1.1**. The currently supported target is Codex on macOS with Apple Silicon. The source is public under Apache License 2.0; beta limitations and third-party terms remain documented below.
 
 Videomontazhka is an independent project by Aleksei Ulyanov. Codex, OpenAI, ElevenLabs, GSAP, Browser Use, FFmpeg, and other third-party names are used only to describe compatibility and provenance; their mention does not imply endorsement or affiliation.
 
@@ -124,6 +124,8 @@ videos/
     ├── takes_packed.md
     ├── semantic_plan.json
     ├── approval.json
+    ├── creative_treatment_plan.json
+    ├── creative_approval.json
     ├── creative/
     ├── edl_<deliverable>.json
     ├── <deliverable-preview>.mp4
@@ -161,7 +163,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and the [synthetic demo](examples/synthet
 - Optional adapters do not grant rights to third-party media, music, plugins, or fonts.
 - FFmpeg is not distributed with the repository; the license and capability set depend on the local build.
 - Large transcription preflight snapshots need temporary free space approximately equal to the largest approved source plus extracted WAV.
-- Dependency locks with hashes and a broader macOS/FFmpeg version matrix remain pre-stable-release work. The historical `video-use` import commit was not recorded. [PROVENANCE.md](PROVENANCE.md) records the reviewed default-branch revisions and the remaining remote-ref provenance gap. A formal SBOM is required if a future release adds bundled runtimes or binaries.
+- Dependency locks with hashes and a broader macOS/FFmpeg version matrix remain pre-stable-release work. The historical `video-use` import commit was not recorded. [PROVENANCE.md](PROVENANCE.md) records the `verified default-branch revisions` and the remaining remote-ref provenance gap. A formal SBOM is required if a future release adds bundled runtimes or binaries.
 
 Original Videomontazhka code is licensed under Apache License 2.0. Bundled, derived, and optional components retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), [DEPENDENCIES.md](DEPENDENCIES.md), and [PROVENANCE.md](PROVENANCE.md).
 

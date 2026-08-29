@@ -6,7 +6,7 @@
 
 | Компонент | Источник | Версия/ревизия | Лицензия | Что включено | Изменения |
 |---|---|---|---|---|---|
-| video-use | <https://github.com/browser-use/video-use> | Единый import commit не был записан; проверенные default-branch revisions четырёх helper-путей перечислены в `PROVENANCE.md`; полнота по всем remote refs пока не подтверждена | MIT, Copyright (c) 2026 Browser Use | Производственные правила, transcript-led подход и четыре помеченных производных файла | Существенно переработано: четыре approval gate, hash-bound артефакты, смысловой и творческий планы, provenance, preview/final QA |
+| video-use | <https://github.com/browser-use/video-use> | Единый import commit не был записан; `verified default-branch revisions` четырёх helper-путей перечислены в `PROVENANCE.md`; полнота по всем remote refs пока не подтверждена | MIT, Copyright (c) 2026 Browser Use | Производственные правила, transcript-led подход и четыре помеченных производных файла | Существенно переработано: четыре approval gate, hash-bound артефакты, смысловой и творческий планы, provenance, preview/final QA |
 | Unbounded | <https://github.com/google/fonts/tree/main/ofl/unbounded> | Точная версия не заявляется; SHA-256 хранится в font manifest | SIL Open Font License 1.1 | Variable TTF и OFL-текст | Файл шрифта не изменён |
 | Golos Text | <https://github.com/google/fonts/tree/main/ofl/golostext> | Точная версия не заявляется; SHA-256 хранится в font manifest | SIL Open Font License 1.1 | Variable TTF и OFL-текст | Файл шрифта не изменён |
 | JetBrains Mono | <https://github.com/google/fonts/tree/main/ofl/jetbrainsmono> | Точная версия не заявляется; SHA-256 хранится в font manifest | SIL Open Font License 1.1 | Variable TTF и OFL-текст | Файл шрифта не изменён |
@@ -48,15 +48,43 @@ commit `3d3c42e5aac5ba805825da76410c181273ba90b1`. Исходник:
 <https://github.com/actions/checkout>; лицензия MIT. Action запускается только в
 CI и не включается в дистрибутив Видеомонтажки.
 
+GitHub Actions также использует `actions/setup-python` версии `v6.0.0`,
+закреплённый за commit `e797f83bcb11b83ae66e0230d6156d7c80228e7c`.
+Исходник: <https://github.com/actions/setup-python>; лицензия MIT. Action только
+готовит Python для CI и не включается в дистрибутив Видеомонтажки.
+
 ## Python-зависимости
 
-Python-пакеты не вендорятся. Их версии и диапазоны находятся в:
+Python-пакеты не вендорятся. Базовый runtime, создаваемый
+`install_runtime.py`, имеет ровно три прямые зависимости:
+
+| Прямая зависимость базового runtime | Версия | Источник | Лицензия | Назначение |
+|---|---:|---|---|---|
+| NumPy | `2.4.6` | <https://numpy.org/> | BSD-3-Clause | Численные операции и локальная генерация аудио |
+| Pillow | `12.3.0` | <https://python-pillow.org/> | MIT-CMU | Локальная графика и preview sheets |
+| Requests | `2.34.2` | <https://requests.readthedocs.io/> | Apache-2.0 | Только явно одобренный вызов транскрибации |
+
+Их транзитивные зависимости не объявляются прямыми: установщик записывает
+фактически разрешённые имена и версии пакетов и признак `direct` в
+`RUNTIME_MANIFEST.json`, а `--verify-only` сверяет этот манифест без сети.
+Источник и лицензия каждого установленного пакета в текущую версию runtime
+manifest не входят.
+
+Разработка и стандартный test suite не добавляют отдельный набор Python-пакетов:
+runner использует `unittest`/`compileall` из стандартной библиотеки и те же
+runtime-зависимости, когда тестируется соответствующая функция. Опциональные
+creative/Manim окружения отделены от базового runtime и перечислены в своих
+requirements-файлах:
 
 - `plugins/videomontazhka/skills/videomontazhka/requirements.txt`;
 - `plugins/videomontazhka/skills/videomontazhka/assets/creative-python-requirements.v1.txt`;
 - `plugins/videomontazhka/skills/videomontazhka/assets/manim-runtime-requirements.v1.txt`.
 
-Полный список и лицензионная политика приведены в [DEPENDENCIES.md](DEPENDENCIES.md). При любой поставке готового runtime необходимо заново сформировать SBOM и приложить лицензии именно тех артефактов, которые фактически распространяются.
+Заявленные прямые и опциональные зависимости и политика воспроизводимости
+приведены в [DEPENDENCIES.md](DEPENDENCIES.md); точный фактически установленный
+транзитивный состав сохраняется в `RUNTIME_MANIFEST.json`. При любой поставке
+готового runtime необходимо заново сформировать SBOM и приложить лицензии
+именно тех артефактов, которые фактически распространяются.
 
 ## Как добавить новую зависимость
 

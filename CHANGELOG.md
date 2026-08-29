@@ -2,6 +2,22 @@
 
 Формат следует Keep a Changelog; версия продукта использует Semantic Versioning.
 
+## [0.1.1] — 2026-08-30
+
+### Исправлено
+
+- Gate 3 теперь машинно блокирует производство графики и creative SFX без
+  `creative_approval.json`, привязанного SHA-256 к текущему treatment plan.
+- Контракт deliverable отделяет строгую минимальную длительность от допуска
+  целевой длительности ±15%.
+- Doctor проверяет, что настроенный executable — совместимый Python 3.11+, а не
+  только существующий файл.
+- Базовый runtime публикуется атомарно под bounded install lock; manifest
+  сохраняет полный фактически установленный Python inventory с отметкой прямых
+  зависимостей.
+- Дополнены CI attribution, author/community links и единая формулировка
+  `verified default-branch revisions`.
+
 ## [0.1.0] — 2026-08-29
 
 ### Добавлено

@@ -204,6 +204,7 @@ class CreativeTreatmentCompilerTest(unittest.TestCase):
                     "height": 360,
                     "fps": 30,
                     "target_duration_s": 2.0,
+                    "minimum_duration_s": 1.0,
                     "subtitle_mode": "none",
                     "section_ids": ["section-a", "section-b"],
                     "hook_id": "hook-a",

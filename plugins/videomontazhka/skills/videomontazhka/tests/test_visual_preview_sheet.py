@@ -9,6 +9,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+try:
+    from tests.creative_approval_fixture import write_creative_approval
+except ModuleNotFoundError:  # CI discovers this file as a top-level module.
+    from creative_approval_fixture import write_creative_approval
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
@@ -155,6 +160,7 @@ def make_approved_edit(root: Path, *, visual_id: str = "visual-preview") -> Path
                 "height": 360,
                 "fps": 20,
                 "target_duration_s": 1.0,
+                "minimum_duration_s": 0.5,
                 "subtitle_mode": "none",
                 "section_ids": ["section-1"],
                 "hook_id": "hook-1",
@@ -179,6 +185,7 @@ def make_approved_edit(root: Path, *, visual_id: str = "visual-preview") -> Path
             "user_quote": "I approve this exact visual plan.",
         },
     )
+    write_creative_approval(edit_dir)
     return edit_dir
 
 
