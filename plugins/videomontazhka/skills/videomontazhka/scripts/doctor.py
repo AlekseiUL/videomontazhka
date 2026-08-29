@@ -59,11 +59,13 @@ REQUIRED_FILTERS = {
     "setparams",
     "setpts",
     "split",
-    "subtitles",
     "tonemap",
     "tpad",
     "trim",
-    "zscale",
+}
+CONDITIONAL_FILTERS = {
+    "burned_subtitles": {"subtitles"},
+    "hdr_tonemapping": {"zscale"},
 }
 OPTIONAL_FILTERS = {
     "acompressor",
@@ -173,6 +175,13 @@ def main() -> int:
         "ok": not missing_filters,
         "missing": missing_filters,
         "optional_available": sorted(OPTIONAL_FILTERS & found_filters),
+    }
+    optional["ffmpeg_conditional_capabilities"] = {
+        name: {
+            "ready": not (filters - found_filters),
+            "missing": sorted(filters - found_filters),
+        }
+        for name, filters in CONDITIONAL_FILTERS.items()
     }
 
     runtime_python = configured_python()

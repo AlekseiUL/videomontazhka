@@ -1,8 +1,14 @@
 # Видеомонтажка
 
+[English](README.en.md) · Русский
+
 **Видеомонтажка** — устанавливаемый плагин для Codex, который превращает папку с исходниками в осмысленный готовый ролик: инвентаризирует материалы, транскрибирует речь, предлагает смысловую структуру, удаляет лишние повторы и паузы, строит монтаж, добавляет графику и звук, проверяет результат и готовит публикационный пакет.
 
 Статус: **private beta 0.1**. Первая поддерживаемая конфигурация — Codex на macOS с Apple Silicon. Репозиторий намеренно остаётся приватным до отдельного решения владельца.
+
+Видеомонтажка — независимый проект Алексея Ульянова. Названия Codex, OpenAI, ElevenLabs, GSAP, Browser Use, FFmpeg и других сторонних продуктов используются только для описания совместимости и происхождения; их упоминание не означает одобрение или официальную связь.
+
+Поставляемый продукт — полный исходный репозиторий и автоматический установщик. Готовые Python/Node runtimes, бинарные зависимости, `node_modules` и пользовательские project/source packs не распространяются: установщик создаёт изолированную среду локально из зафиксированных прямых зависимостей; фактический транзитивный состав сохраняется в runtime manifest.
 
 ## Главное правило
 
@@ -19,7 +25,7 @@
 
 ## Что умеет
 
-- Безопасно инвентаризировать один длинный стрим, набор дублей или смешанную папку, не изменяя исходники.
+- Инвентаризировать один длинный стрим, набор дублей или смешанную папку в режиме чтения; штатные проектные результаты писать в `<videos_dir>/edit/`. Для каждого проекта проверяйте исходные hashes и release pack.
 - Создавать привязанный к SHA-256 манифест источников и повторно использовать только актуальные кэши.
 - Получать пословную транскрипцию с таймкодами, определять говорящих и сохранять события аудио, когда это поддерживает выбранный провайдер.
 - Читать видео как компактные текстовые доказательства и запрашивать кадры только в неоднозначных местах.
@@ -38,8 +44,10 @@
 ```bash
 git clone git@github.com:AlekseiUL/videomontazhka.git
 cd videomontazhka
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --install
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py
+brew install ffmpeg python@3.12
+python3.12 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --install
+"$HOME/Library/Application Support/Videomontazhka/runtime/python/bin/python" \
+  plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py
 ```
 
 В Codex добавьте локальный marketplace из `.agents/plugins/marketplace.json` и установите плагин **Видеомонтажка**. Если текущая версия Codex ещё не показывает локальные marketplaces, доступен совместимый ручной вариант:
@@ -53,7 +61,7 @@ ln -sfn "$PWD/plugins/videomontazhka/skills/videomontazhka" ~/.codex/skills/vide
 
 > Используй $videomontazhka. Собери из этой папки цельный YouTube-ролик примерно на 15–18 минут. До любых платных вызовов покажи объём транскрибации, затем предложи смысловой план и дождись моего подтверждения.
 
-Агент создаёт только `<videos_dir>/edit/`. Исходные файлы остаются нетронутыми.
+Внутри папки проекта штатные команды пишут в `<videos_dir>/edit/`; product runtime и one-shot markers размещаются отдельно в per-user application data. Перед релизом сверяйте исходные hashes.
 
 ## Результат проекта
 
@@ -84,7 +92,7 @@ videos/
     └── release_pack.md
 ```
 
-Точные имена отдельных промежуточных файлов могут развиваться вместе со схемами, но четыре подтверждения, неизменяемость источников и проверяемая цепочка происхождения являются контрактом продукта.
+Точные имена отдельных промежуточных файлов могут развиваться вместе со схемами, но четыре подтверждения, чтение источников без штатной перезаписи и проверяемая цепочка происхождения являются контрактом поддерживаемого контура. Перед релизом сверяйте исходные hashes.
 
 ## Установка зависимостей
 
@@ -92,10 +100,18 @@ videos/
 
 ```bash
 brew install ffmpeg python@3.12
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --install
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --verify-only
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
+python3.12 --version  # должно быть 3.11+
+python3.12 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --install
+"$HOME/Library/Application Support/Videomontazhka/runtime/python/bin/python" \
+  plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --verify-only
+"$HOME/Library/Application Support/Videomontazhka/runtime/python/bin/python" \
+  plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
 ```
+
+Не полагайтесь на непроверенный `/usr/bin/python3`: в некоторых версиях macOS
+это Python 3.9, который не соответствует контракту beta. Инсталлятор теперь
+останавливается до создания runtime и показывает явную ошибку, если запущен на
+Python ниже 3.11.
 
 Дополнительные визуальные движки ставятся только тогда, когда их выбрала творческая карта. Перед установкой или загрузкой агент показывает, зачем нужен компонент и какие у него лицензионные условия.
 
@@ -139,3 +155,10 @@ python3 plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
 См. [CONTRIBUTING.md](CONTRIBUTING.md). Все тесты используют синтетические данные, не обращаются к платным API и не требуют пользовательских видео. Минимальный безмедийный сценарий находится в [examples/synthetic-demo](examples/synthetic-demo/README.md).
 
 Оригинальный код Видеомонтажки лицензирован по Apache License 2.0. Заимствованные и опциональные компоненты сохраняют собственные лицензии; подробности приведены в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Ресурсы автора
+
+- [GitHub — AlekseiUL](https://github.com/AlekseiUL)
+- [SPRUT_AI](https://t.me/Sprut_AI) — открытые заметки, кейсы и инструменты
+- [Telegram-чат](https://t.me/+eH-qNIDmud8zNDZi) — вопросы и обмен опытом
+- [AI ОПЕРАЦИОНКА](https://t.me/tribute/app?startapp=sJyg) — готовые проекты, рабочие файлы, гайды и подробные разборы

@@ -6,10 +6,12 @@
 
 | Компонент | Источник | Версия/ревизия | Лицензия | Что включено | Изменения |
 |---|---|---|---|---|---|
-| video-use | <https://github.com/browser-use/video-use> | Исторический commit импорта не был зафиксирован; выдуманная ревизия не указывается | MIT, Copyright (c) 2026 Browser Use | Производственные правила, transcript-led подход и производный код | Существенно переработано: четыре approval gate, hash-bound артефакты, смысловой и творческий планы, provenance, preview/final QA |
+| video-use | <https://github.com/browser-use/video-use> | Единый import commit не был записан; проверенные default-branch revisions четырёх helper-путей перечислены в `PROVENANCE.md`; полнота по всем remote refs пока не подтверждена | MIT, Copyright (c) 2026 Browser Use | Производственные правила, transcript-led подход и четыре помеченных производных файла | Существенно переработано: четыре approval gate, hash-bound артефакты, смысловой и творческий планы, provenance, preview/final QA |
 | Unbounded | <https://github.com/google/fonts/tree/main/ofl/unbounded> | Точная версия не заявляется; SHA-256 хранится в font manifest | SIL Open Font License 1.1 | Variable TTF и OFL-текст | Файл шрифта не изменён |
 | Golos Text | <https://github.com/google/fonts/tree/main/ofl/golostext> | Точная версия не заявляется; SHA-256 хранится в font manifest | SIL Open Font License 1.1 | Variable TTF и OFL-текст | Файл шрифта не изменён |
 | JetBrains Mono | <https://github.com/google/fonts/tree/main/ofl/jetbrainsmono> | Точная версия не заявляется; SHA-256 хранится в font manifest | SIL Open Font License 1.1 | Variable TTF и OFL-текст | Файл шрифта не изменён |
+
+Документированное default-branch сравнение выполнено для файлов `pack_transcripts_safe.py`, `render_edl.py`, `transcribe_batch_safe.py` и `transcribe_safe.py`. Карта, хеши, проверенный scope и оставшийся remote-ref gap находятся в `PROVENANCE.md`. При обнаружении нового производного файла эта карта и его header должны быть обновлены до релиза.
 
 Полный MIT-текст video-use находится в `third_party/licenses/video-use-MIT.txt`. Полные OFL-тексты и оригинальные copyright-строки находятся рядом с соответствующими файлами в `plugins/videomontazhka/skills/videomontazhka/assets/fonts/`. Это место является каноническим: при копировании шрифта в проект инструмент копирует и его лицензию.
 

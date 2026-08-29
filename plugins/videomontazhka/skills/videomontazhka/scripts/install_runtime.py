@@ -34,10 +34,22 @@ REQUIREMENTS = SKILL_ROOT / "requirements.txt"
 DEFAULT_RUNTIME = PYTHON_RUNTIME
 REQUIRED_IMPORTS = ("PIL", "numpy", "requests")
 REQUIREMENT_RE = re.compile(r"^([A-Za-z0-9_.-]+)\s*(.*)$")
+MINIMUM_PYTHON = (3, 11)
 
 
 class RuntimeInstallError(RuntimeError):
     pass
+
+
+def ensure_supported_python(version_info: tuple[int, ...] | None = None) -> None:
+    observed = tuple((version_info or sys.version_info)[:2])
+    if observed < MINIMUM_PYTHON:
+        required = ".".join(str(part) for part in MINIMUM_PYTHON)
+        actual = ".".join(str(part) for part in observed)
+        raise RuntimeInstallError(
+            f"Python {required}+ is required; installer is running under Python {actual}. "
+            "Invoke this script with a supported interpreter (for example python3.12)."
+        )
 
 
 def sha256(path: Path) -> str:
@@ -268,6 +280,7 @@ def install(runtime: Path, *, prefer_uv: bool = True) -> dict[str, Any]:
 
 
 def main() -> int:
+    ensure_supported_python()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--runtime", type=Path, default=DEFAULT_RUNTIME)
     parser.add_argument("--json", action="store_true", help="emit JSON")

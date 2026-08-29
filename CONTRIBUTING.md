@@ -9,12 +9,13 @@ Private beta принимает небольшие, проверяемые из�
 ## Локальная проверка
 
 ```bash
-python3 -m compileall -q plugins/videomontazhka/skills/videomontazhka/scripts
-python3 -m unittest discover \
+PY="$HOME/Library/Application Support/Videomontazhka/runtime/python/bin/python"
+"$PY" -m compileall -q plugins/videomontazhka/skills/videomontazhka/scripts
+"$PY" -m unittest discover \
   -s plugins/videomontazhka/skills/videomontazhka/tests \
   -t plugins/videomontazhka/skills/videomontazhka \
   -p 'test_*.py'
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
+"$PY" plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
 ```
 
 Тесты не должны обращаться к ElevenLabs, сети или реальным пользовательским данным. Интеграционные медиа генерируются локально через FFmpeg и удаляются после теста. Отсутствующий опциональный движок приводит к честному skip, а не к автоматической установке.
@@ -22,7 +23,7 @@ python3 plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
 ## Контракты, которые нельзя ослаблять
 
 - Четыре подтверждения: стоимость/приватность, смысл/формат, визуал/звук, preview.
-- Исходники неизменяемы; запись ограничена проектным `edit/` и конфигурируемым runtime.
+- Штатный поддерживаемый контур открывает исходники на чтение и ограничивает проектную запись каталогом `edit/`; проверяйте hashes до и после затронутого сценария.
 - Любое повторное использование проверяет hashes и идентичность инструмента.
 - Неоднозначность, которая меняет цену или смысл, возвращается человеку.
 - Финальный рендер не обходит approval и release QA.

@@ -15,7 +15,7 @@ Codex skill
   └─ external boundary: ElevenLabs только после Gate 1
 
 user project
-  ├─ immutable source media
+  ├─ source media opened read-only by supported product scripts
   └─ edit/ — вся изменяемая история проекта
 
 application data
@@ -100,7 +100,7 @@ Router выбирает capability, а registry отвечает, доступн
 - Новые manifests публикуются через temporary file + atomic replace.
 - Existing runtime не перезаписывается установщиком.
 - Незавершённый результат имеет `.part`/temporary имя и не считается готовым; восстановить можно только полный response с точной встроенной cache identity.
-- Project lock предотвращает параллельный transcript batch; exclusive marker вне проекта погашает capability до HTTP, а append-only hash-chain ledger сохраняет аудит внутри проекта.
+- Project lock предотвращает параллельный transcript batch; exclusive marker вне проекта погашает capability до HTTP, а append-only hash-chain ledger сохраняет локальную трассировку событий внутри проекта. Это не внешний неизменяемый журнал и не доказательство личности.
 - Неоднозначный сетевой исход блокирует автоматический retry и требует нового preflight/approval; успешно завершённые sources возобновляются из кэша.
 - Перед извлечением аудио одобренные source bytes копируются в приватный snapshot и повторно сверяются по size/SHA-256; FFmpeg не читает изменяемый pathname после этой проверки.
 - Ошибка QA блокирует approval/final, а не превращается в warning.
@@ -108,4 +108,4 @@ Router выбирает capability, а registry отвечает, доступн
 
 ## Дальнейшее развитие
 
-Перед переходом из private beta нужны: публично воспроизводимый dependency lock с hashes, восстановленная точная upstream revision video-use, тестовая матрица версий macOS/FFmpeg, formal SBOM для релизных runtime bundles (если они появятся) и отдельная проверка публичных примеров на права/персональные данные.
+Перед переходом из private beta нужны: публично воспроизводимый dependency lock с hashes, тестовая матрица версий macOS/FFmpeg и отдельная проверка публичных примеров на права/персональные данные. Исторический commit импорта `video-use` не был записан; вместо выдуманного hash в `PROVENANCE.md` сохранено документированное сравнение всех релевантных датированных upstream-версий. Formal SBOM обязателен, если будущий релиз начнёт поставлять готовые runtimes или binaries.

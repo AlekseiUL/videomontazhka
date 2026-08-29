@@ -16,10 +16,20 @@ ffprobe -version
 Ожидаемая архитектура beta — `arm64`. Если FFmpeg отсутствует, установите его выбранным вами способом; Homebrew-вариант:
 
 ```bash
-brew install ffmpeg
+brew install ffmpeg python@3.12
+python3.12 --version
 ```
 
-FFmpeg не поставляется проектом. Лицензия локальной сборки зависит от её флагов и включённых кодеков.
+Команда версии должна показать Python 3.11 или новее. Не полагайтесь на
+непроверенный `/usr/bin/python3`: на некоторых версиях macOS это Python 3.9.
+Инсталлятор откажется создавать runtime под неподдерживаемым интерпретатором.
+
+FFmpeg не поставляется проектом. Лицензия локальной сборки зависит от её флагов
+и включённых кодеков. После установки `doctor.py` отдельно проверяет фильтры:
+обычная сборка может не содержать `subtitles` или `zscale`; в таком случае
+doctor оставляет базовый SDR/sidecar-контур доступным, но явно помечает burned
+subtitles или HDR tonemapping неготовыми, пока не установлена сборка FFmpeg с
+соответствующими библиотеками.
 
 ## 1. Получить репозиторий
 
@@ -54,13 +64,14 @@ Runtime хранится вне Git и вне папки с видео. На mac
 Установка является явным сетевым действием: она может обратиться к Python package index, создаёт новое изолированное окружение и при ошибке удаляет только недостроенную новую цель.
 
 ```bash
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --install
+python3.12 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --install
 ```
 
 Скрипт откажется перезаписывать уже существующий runtime. Проверка полностью offline:
 
 ```bash
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --verify-only
+"$HOME/Library/Application Support/Videomontazhka/runtime/python/bin/python" \
+  plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --verify-only
 ```
 
 Чтобы использовать другой корень, задайте `VIDEOMONTAZHKA_HOME` или более узкий `VIDEOMONTAZHKA_RUNTIME_DIR` до установки. Не направляйте runtime внутрь репозитория или проекта с видео.
@@ -68,8 +79,10 @@ python3 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py 
 ## 4. Запустить doctor
 
 ```bash
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
+"$HOME/Library/Application Support/Videomontazhka/runtime/python/bin/python" \
+  plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py
+"$HOME/Library/Application Support/Videomontazhka/runtime/python/bin/python" \
+  plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
 ```
 
 Doctor ничего не устанавливает и не вызывает платный API. Он показывает фактические пути, доступные инструменты, необязательные возможности и блокеры. Отсутствие GSAP/Manim/HyperFrames не мешает базовому монтажу: эти движки нужны только для выбранных сцен.

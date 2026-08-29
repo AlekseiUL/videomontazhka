@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Portions derived from video-use, Copyright (c) 2026 Browser Use, MIT License.
-# Modifications Copyright 2026 SPRUT_AI contributors, Apache-2.0.
+# Modifications Copyright 2026 Алексей Ульянов, Apache-2.0.
 # See repository NOTICE and third_party/licenses/video-use-MIT.txt.
 """Transcribe all manifest sources behind a cost/privacy approval gate."""
 

@@ -98,6 +98,14 @@ class RuntimePathsTest(unittest.TestCase):
         self.assertFalse(install_runtime._satisfies("2.4.7", constraints["numpy"]))
         self.assertTrue(constraints["requests"])
 
+    def test_runtime_installer_rejects_python_older_than_3_11(self) -> None:
+        with self.assertRaisesRegex(
+            install_runtime.RuntimeInstallError,
+            r"Python 3\.11\+ is required; installer is running under Python 3\.9",
+        ):
+            install_runtime.ensure_supported_python((3, 9, 6))
+        install_runtime.ensure_supported_python((3, 11, 0))
+
 
 if __name__ == "__main__":
     unittest.main()

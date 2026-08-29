@@ -3,8 +3,9 @@
 Начинайте с offline-команд:
 
 ```bash
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --verify-only
-python3 plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
+PY="$HOME/Library/Application Support/Videomontazhka/runtime/python/bin/python"
+"$PY" plugins/videomontazhka/skills/videomontazhka/scripts/install_runtime.py --verify-only
+"$PY" plugins/videomontazhka/skills/videomontazhka/scripts/doctor.py --json
 ```
 
 Не переустанавливайте всё автоматически: это стирает полезные признаки причины и может скачать ненужные пакеты.

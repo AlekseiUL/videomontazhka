@@ -47,6 +47,13 @@ class DoctorMotionStackTest(unittest.TestCase):
         self.assertEqual(Path(report["paths"]["runtime_root"]), app_home.resolve() / "runtime")
         python_runtime = report["required"]["python_runtime"]
         self.assertIn("recommended_install_command", python_runtime)
+        conditional_filters = report["optional"]["ffmpeg_conditional_capabilities"]
+        self.assertEqual(
+            set(conditional_filters),
+            {"burned_subtitles", "hdr_tonemapping"},
+        )
+        for capability in conditional_filters.values():
+            self.assertEqual(capability["ready"], not capability["missing"])
         hyperframes = report["optional"]["hyperframes_local"]
         for field in ("ready", "installed", "path", "version", "node"):
             self.assertIn(field, hyperframes)
