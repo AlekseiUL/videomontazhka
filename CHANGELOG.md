@@ -6,7 +6,7 @@
 
 ### Добавлено
 
-- Private beta плагина **Видеомонтажка** для Codex на macOS/Apple Silicon.
+- Public beta плагина **Видеомонтажка** для Codex на macOS/Apple Silicon.
 - Инвентаризация исходников и hash-bound source manifest.
 - Transcript-led смысловой монтаж с доказательствами и таймкодами.
 - Четыре approval gate: стоимость/приватность, смысл/формат, визуал/звук и preview.
