@@ -15,11 +15,13 @@ jobs:
     env:
       ELEVENLABS_API_KEY: ""
       PYTHONDONTWRITEBYTECODE: "1"
-      VIDEOMONTAZHKA_HOME: "${{ runner.temp }}/Videomontazhka"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Configure isolated application home
+        run: echo "VIDEOMONTAZHKA_HOME=$RUNNER_TEMP/Videomontazhka" >> "$GITHUB_ENV"
 
       - name: Parse every JSON document
         run: |
