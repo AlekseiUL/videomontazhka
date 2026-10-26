@@ -163,5 +163,14 @@ jobs:
           python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_mixed_evidence.py'
           python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_external_visual_provenance.py'
 
+      - name: Install offline render dependencies
+        run: |
+          command -v ffmpeg >/dev/null || brew install ffmpeg
+          python3 -m pip install 'Pillow==11.3.0' 'numpy==2.2.6'
+          command -v ffprobe
+
+      - name: Render synthetic media through approval and release gates
+        run: python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_end_to_end.py' -v
+
       - name: Assert tests never require an API key
         run: test -z "$ELEVENLABS_API_KEY"
