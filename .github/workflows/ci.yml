@@ -166,7 +166,7 @@ jobs:
       - name: Install offline render dependencies
         run: |
           command -v ffmpeg >/dev/null || brew install ffmpeg
-          python3 -m pip install 'Pillow==11.3.0' 'numpy==2.2.6'
+          python3 -m pip install -r requirements-audit.txt
           command -v ffprobe
 
       - name: Render synthetic media through approval and release gates

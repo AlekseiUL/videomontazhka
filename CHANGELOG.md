@@ -1,5 +1,12 @@
 # История изменений
 
+## v0.1.2 — unreleased
+
+- Include the accepted main-branch remediation since the prior published tag.
+- Pin CI Actions to verified commits and add review-first dependency maintenance.
+- Re-run offline regression and clean artifact installation before publication.
+
+
 Формат следует Keep a Changelog; версия продукта использует Semantic Versioning.
 
 ## [0.1.1] — 2026-08-30
