@@ -1,6 +1,6 @@
 {
   "name": "videomontazhka",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Approval-gated, transcript-led local video editing for Codex.",
   "author": {
     "name": "Aleksei Ulyanov",
