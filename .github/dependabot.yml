@@ -3,10 +3,19 @@ version: 2
 updates:
 - package-ecosystem: github-actions
   directory: /
+  groups:
+    actions-compatible:
+      patterns: ['*']
+      update-types: [minor, patch]
   schedule:
     interval: weekly
   open-pull-requests-limit: 5
 - package-ecosystem: pip
+  # Separate environments deliberately pin different NumPy versions.
+  # Revisit with OpenCV metadata and both installed-runtime smokes.
+  ignore:
+  - dependency-name: numpy
+    versions: ['>2.2.6']
   directory: /plugins/videomontazhka/skills/videomontazhka
   schedule:
     interval: weekly
