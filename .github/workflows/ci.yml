@@ -157,6 +157,7 @@ jobs:
         run: |
           python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_portability.py'
           python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_runtime_paths.py'
+          python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_creative_python_runtime.py'
           python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_transcription_approval_gate.py'
           python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_transcription_path_safety.py'
           python3 -m unittest discover -s plugins/videomontazhka/skills/videomontazhka/tests -p 'test_font_pack.py'
