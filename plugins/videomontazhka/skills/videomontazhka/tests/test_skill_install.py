@@ -16,7 +16,9 @@ class SkillInstallTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="skill-install-")
         self.addCleanup(self.temp.cleanup)
-        self.home = Path(self.temp.name)
+        # macOS TMPDIR can use /var -> /private/var. Relative links must be
+        # computed from the physical directory, not its differently deep alias.
+        self.home = Path(self.temp.name).resolve()
         self.target = self.home / ".codex" / "skills" / "videomontazhka"
 
     def run_install(self):
@@ -42,7 +44,8 @@ class SkillInstallTests(unittest.TestCase):
         self.prepare_parent()
         self.target.symlink_to(os.path.relpath(SKILL, self.target.parent))
         original = os.readlink(self.target)
-        self.assertEqual(self.run_install().returncode, 0)
+        result = self.run_install()
+        self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(os.readlink(self.target), original)
 
     def test_conflicts_are_preserved(self):
