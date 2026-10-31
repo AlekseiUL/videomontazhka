@@ -1,6 +1,13 @@
 # История изменений
 
-## v0.1.2 — unreleased
+## Unreleased
+
+- Make the fallback skill install non-destructive and test repeat/conflict paths.
+- Align EN/RU setup and version notes with the published release.
+
+## [0.1.2] — 2026-10-27
+
+Publication record: [GitHub Release v0.1.2](https://github.com/AlekseiUL/videomontazhka/releases/tag/v0.1.2).
 
 - Include the accepted main-branch remediation since the prior published tag.
 - Pin CI Actions to verified commits and add review-first dependency maintenance.

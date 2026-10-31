@@ -4,7 +4,7 @@ English · [Русский](README.ru.md)
 
 **Videomontazhka** is an installable Codex plugin for transcript-led local video editing. It inventories source media, prepares a hash-bound transcription workflow, proposes an evidence-backed story structure, builds an edit decision list, renders approved graphics and audio, checks the result, and prepares a release pack.
 
-Status: **public beta 0.1.1**. The currently supported target is Codex on macOS with Apple Silicon. The source is public under Apache License 2.0; beta limitations and third-party terms remain documented below.
+Status: **public beta 0.1.2** ([published release](https://github.com/AlekseiUL/videomontazhka/releases/tag/v0.1.2)). The currently supported target is Codex on macOS with Apple Silicon. The source is public under Apache License 2.0; beta limitations and third-party terms remain documented below. Quick start uses the current checkout, which can include fixes newer than the release.
 
 Videomontazhka is an independent project by Aleksei Ulyanov. Codex, OpenAI, ElevenLabs, GSAP, Browser Use, FFmpeg, and other third-party names are used only to describe compatibility and provenance; their mention does not imply endorsement or affiliation.
 
@@ -86,9 +86,10 @@ The ordinary Homebrew FFmpeg build may omit the `subtitles` or `zscale` filters.
 Add `.agents/plugins/marketplace.json` as a local marketplace in Codex and install **Videomontazhka**. If the current Codex build does not expose local marketplaces, use the compatible skill link:
 
 ```bash
-mkdir -p ~/.codex/skills
-ln -sfn "$PWD/plugins/videomontazhka/skills/videomontazhka" ~/.codex/skills/videomontazhka
+python3.12 plugins/videomontazhka/skills/videomontazhka/scripts/install_skill.py
 ```
+
+The helper creates `~/.codex/skills/videomontazhka` only when absent. An existing link to this checkout is a successful no-op. Any other link (including a broken link), file, or directory is preserved and installation stops. Inspect the conflict and move it to a backup location yourself before retrying; there is no force/overwrite option. Keep the checkout in place while using the link. The helper does not install a runtime or access the network.
 
 Open a folder containing your source media in Codex and start with a bounded request:
 

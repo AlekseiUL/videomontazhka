@@ -1,6 +1,6 @@
 # Release candidate v0.1.2
 
-Status: prepared, not published. Publish only after the exact PR head passes CI and the owner approves merge/release. Existing tags must not move.
+Historical preparation record. v0.1.2 was published on 2026-10-27; the [GitHub Release](https://github.com/AlekseiUL/videomontazhka/releases/tag/v0.1.2) is the publication record for accepted commit `8a5eadfe6dbb418f93bd97eb8cfff02059eb255c`. The current checkout can include later fixes. Existing tags must not move. The following instructions describe the pre-publication gate, not a pending release.
 
 Distribution: complete source archive. This candidate includes all changes on main since v0.1.1, plus pinned GitHub Actions and review-first dependency updates. This is not an npm/PyPI publication.
 

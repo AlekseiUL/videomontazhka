@@ -2,7 +2,7 @@
 
 ## Поддерживаемая конфигурация
 
-Первая проверяемая цель — macOS на Apple Silicon, актуальный Codex, Git, Python 3.11+ и FFmpeg/ffprobe. Нужен доступ к приватному репозиторию `AlekseiUL/videomontazhka`. ElevenLabs и опциональные визуальные движки для самой установки не требуются.
+Первая проверяемая цель — macOS на Apple Silicon, актуальный Codex, Git, Python 3.11+ и FFmpeg/ffprobe. Репозиторий `AlekseiUL/videomontazhka` публичный. ElevenLabs и опциональные визуальные движки для самой установки не требуются.
 
 Проверьте архитектуру и базовые команды:
 
@@ -34,11 +34,11 @@ subtitles или HDR tonemapping неготовыми, пока не устан�
 ## 1. Получить репозиторий
 
 ```bash
-git clone git@github.com:AlekseiUL/videomontazhka.git
+git clone https://github.com/AlekseiUL/videomontazhka.git
 cd videomontazhka
 ```
 
-Если SSH не настроен, используйте HTTPS только через обычный credential helper GitHub. Не вставляйте personal access token в URL, prompt или shell history.
+Для публичного HTTPS-клонирования токен не нужен. Не вставляйте personal access token в URL, prompt или shell history.
 
 ## 2. Установить плагин в Codex
 
@@ -47,9 +47,10 @@ cd videomontazhka
 Совместимый ручной fallback:
 
 ```bash
-mkdir -p ~/.codex/skills
-ln -sfn "$PWD/plugins/videomontazhka/skills/videomontazhka" ~/.codex/skills/videomontazhka
+python3.12 plugins/videomontazhka/skills/videomontazhka/scripts/install_skill.py
 ```
+
+Ожидаемый результат — `Skill ready:` и путь `~/.codex/skills/videomontazhka`. Новый путь становится ссылкой на навык в этой копии репозитория; повторный запуск с уже верной ссылкой ничего не меняет. Если путь занят файлом, каталогом, чужой или битой ссылкой, скрипт выводит `Refusing to replace existing entry` и завершает работу с ошибкой, сохраняя объект. Проверьте его и при необходимости сами перенесите в резервное место перед повторным запуском. Симлинки вместо родительских каталогов установки также требуют ручной проверки. Принудительной перезаписи нет; сеть и runtime этот скрипт не использует. Не перемещайте копию репозитория, пока используете ссылку.
 
 После установки начните новую задачу Codex и явно вызовите `$videomontazhka` в первом запросе.
 
